@@ -1,0 +1,855 @@
+{
+  "config": {
+    "adminEmail": "avigayan2008work@gmail.com",
+    "adminName": "CYBEX D - AVIGAYAN JANA",
+    "sectionName": "CSE CYBER SEC-D",
+    "batchYear": "2024 - 2028",
+    "academicYear": "Semester I",
+    "updatedAt": "2026-09-24T19:22:06.780Z"
+  },
+  "announcements": [
+    {
+      "id": "ann-1790192081860",
+      "createdAt": "2026-09-23T19:34:41.860Z",
+      "isPinned": true,
+      "priority": "High",
+      "category": "General",
+      "title": "PLEASE FILL THE FACULTY FEEDBACK FORM ASAP !!!",
+      "content": "FILL THE GFORM",
+      "authorName": "CYBEX D - Class Representative"
+    }
+  ],
+  "timetable": [
+    {
+      "id": "tt-mon-1",
+      "day": "Monday",
+      "period": "3",
+      "startTime": "11:00",
+      "endTime": "11:50",
+      "subject": "Art of Listening, Speaking and Reading Skills",
+      "subjectCode": "AEC 101",
+      "faculty": "Dr. Antarleena Basu (26093)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "blue"
+    },
+    {
+      "id": "tt-mon-2",
+      "day": "Monday",
+      "period": "4",
+      "startTime": "12:00",
+      "endTime": "12:50",
+      "subject": "Art of Listening, Speaking and Reading Skills",
+      "subjectCode": "AEC 101",
+      "faculty": "Dr. Antarleena Basu (26093)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "blue"
+    },
+    {
+      "id": "tt-tue-1",
+      "day": "Tuesday",
+      "period": "1",
+      "startTime": "09:00",
+      "endTime": "09:50",
+      "subject": "Analytical Reasoning & Aptitude Skills - I",
+      "subjectCode": "SEC 101",
+      "faculty": "Mr. Skilling Course (Tmp124)",
+      "room": "S 312",
+      "type": "Tutorial",
+      "color": "amber"
+    },
+    {
+      "id": "tt-tue-2",
+      "day": "Tuesday",
+      "period": "2",
+      "startTime": "10:00",
+      "endTime": "10:50",
+      "subject": "Analytical Reasoning & Aptitude Skills - I",
+      "subjectCode": "SEC 101",
+      "faculty": "Mr. Skilling Course (Tmp124)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "amber"
+    },
+    {
+      "id": "tt-tue-3",
+      "day": "Tuesday",
+      "period": "5",
+      "startTime": "13:00",
+      "endTime": "13:50",
+      "subject": "Fundamentals of Computing & Programming in C (Lab)",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi / Dr. Sahadeb Shit",
+      "room": "V 602",
+      "type": "Lab",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-tue-4",
+      "day": "Tuesday",
+      "period": "6",
+      "startTime": "14:00",
+      "endTime": "14:50",
+      "subject": "Fundamentals of Computing & Programming in C (Lab)",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi / Dr. Sahadeb Shit",
+      "room": "V 602",
+      "type": "Lab",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-tue-5",
+      "day": "Tuesday",
+      "period": "7",
+      "startTime": "15:00",
+      "endTime": "15:50",
+      "subject": "Engineering Physics",
+      "subjectCode": "FIC 102",
+      "faculty": "Dr. Krishna Prasad Maity (24123)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "emerald"
+    },
+    {
+      "id": "tt-wed-1",
+      "day": "Wednesday",
+      "period": "1",
+      "startTime": "09:00",
+      "endTime": "09:50",
+      "subject": "Fundamentals of Computing & Programming in C",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi (25358)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-wed-2",
+      "day": "Wednesday",
+      "period": "2",
+      "startTime": "10:00",
+      "endTime": "10:50",
+      "subject": "Calculus for Engineers",
+      "subjectCode": "FIC 103",
+      "faculty": "Dr. Koyel Chakravarty (22108)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "purple"
+    },
+    {
+      "id": "tt-wed-3",
+      "day": "Wednesday",
+      "period": "3",
+      "startTime": "11:00",
+      "endTime": "11:50",
+      "subject": "Calculus for Engineers",
+      "subjectCode": "FIC 103",
+      "faculty": "Dr. Koyel Chakravarty (22108)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "purple"
+    },
+    {
+      "id": "tt-wed-4",
+      "day": "Wednesday",
+      "period": "5",
+      "startTime": "13:00",
+      "endTime": "13:50",
+      "subject": "Environmental Science",
+      "subjectCode": "VAC 101",
+      "faculty": "Dr. Kousik Das (22118)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "teal"
+    },
+    {
+      "id": "tt-wed-5",
+      "day": "Wednesday",
+      "period": "6",
+      "startTime": "14:00",
+      "endTime": "14:50",
+      "subject": "Environmental Science",
+      "subjectCode": "VAC 101",
+      "faculty": "Dr. Kousik Das (22118)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "teal"
+    },
+    {
+      "id": "tt-thu-1",
+      "day": "Thursday",
+      "period": "1",
+      "startTime": "09:00",
+      "endTime": "09:50",
+      "subject": "Analytical Reasoning & Aptitude Skills - I",
+      "subjectCode": "SEC 101",
+      "faculty": "Mr. Skilling Course (Tmp124)",
+      "room": "S 312",
+      "type": "Tutorial",
+      "color": "amber"
+    },
+    {
+      "id": "tt-thu-2",
+      "day": "Thursday",
+      "period": "3",
+      "startTime": "11:00",
+      "endTime": "11:50",
+      "subject": "Fundamentals of Computing & Programming in C (Lab)",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi (25358)",
+      "room": "V 403",
+      "type": "Lab",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-thu-3",
+      "day": "Thursday",
+      "period": "4",
+      "startTime": "12:00",
+      "endTime": "12:50",
+      "subject": "Fundamentals of Computing & Programming in C (Lab)",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi (25358)",
+      "room": "V 403",
+      "type": "Lab",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-thu-4",
+      "day": "Thursday",
+      "period": "7",
+      "startTime": "15:00",
+      "endTime": "15:50",
+      "subject": "Engineering Physics (Lab)",
+      "subjectCode": "FIC 102",
+      "faculty": "Dr. Krishna Prasad Maity (24123)",
+      "room": "V 306",
+      "type": "Lab",
+      "color": "emerald"
+    },
+    {
+      "id": "tt-thu-5",
+      "day": "Thursday",
+      "period": "8",
+      "startTime": "16:00",
+      "endTime": "17:30",
+      "subject": "Engineering Physics (Lab)",
+      "subjectCode": "FIC 102",
+      "faculty": "Dr. Krishna Prasad Maity (24123)",
+      "room": "V 306",
+      "type": "Lab",
+      "color": "emerald"
+    },
+    {
+      "id": "tt-fri-1",
+      "day": "Friday",
+      "period": "3",
+      "startTime": "11:00",
+      "endTime": "11:50",
+      "subject": "Engineering Physics",
+      "subjectCode": "FIC 102",
+      "faculty": "Dr. Krishna Prasad Maity (24123)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "emerald"
+    },
+    {
+      "id": "tt-fri-2",
+      "day": "Friday",
+      "period": "4",
+      "startTime": "12:00",
+      "endTime": "12:50",
+      "subject": "Calculus for Engineers",
+      "subjectCode": "FIC 103",
+      "faculty": "Dr. Koyel Chakravarty (22108)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "purple"
+    },
+    {
+      "id": "tt-fri-3",
+      "day": "Friday",
+      "period": "5",
+      "startTime": "13:00",
+      "endTime": "13:50",
+      "subject": "Fundamentals of Computing & Programming in C",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi (25358)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "indigo"
+    },
+    {
+      "id": "tt-fri-4",
+      "day": "Friday",
+      "period": "6",
+      "startTime": "14:00",
+      "endTime": "14:50",
+      "subject": "Fundamentals of Computing & Programming in C",
+      "subjectCode": "CSE 101",
+      "faculty": "Dr. Mudavath Ravi (25358)",
+      "room": "S 312",
+      "type": "Lecture",
+      "color": "indigo"
+    }
+  ],
+  "materials": [],
+  "feedback": [],
+  "doubts": [],
+  "students": [
+    {
+      "id": 1,
+      "rollNumber": "AP26110090206",
+      "name": "REPUDI BHARATH",
+      "email": "repudi_bharath@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 2,
+      "rollNumber": "AP26110090207",
+      "name": "YADLAPALLI VAISHNAVI",
+      "email": "yadlapalli_vaishnavi@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 3,
+      "rollNumber": "AP26110090208",
+      "name": "CHALASANI BRAHMANI",
+      "email": "chalasani_brahmani@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 4,
+      "rollNumber": "AP26110090209",
+      "name": "VAKACHARLA ABHISHIKTH",
+      "email": "vakacharla_abhishikth@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 5,
+      "rollNumber": "AP26110090210",
+      "name": "MADINENI VENKAT SAI",
+      "email": "madineni_venkat_sai@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 6,
+      "rollNumber": "AP26110090211",
+      "name": "BATHULA JAGADIESWAR RAO",
+      "email": "bathula_jagadieswar_rao@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 7,
+      "rollNumber": "AP26110090212",
+      "name": "PYLA SHASHANK",
+      "email": "pyla_shashank@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 8,
+      "rollNumber": "AP26110090213",
+      "name": "KURMALA JOSHITH RAJ",
+      "email": "kurmala_joshith_raj@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 9,
+      "rollNumber": "AP26110090214",
+      "name": "SUDHANSHU BISAI",
+      "email": "sudhanshu_bisai@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 10,
+      "rollNumber": "AP26110090215",
+      "name": "SOUMIL SHARMA",
+      "email": "soumil_sharma@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 11,
+      "rollNumber": "AP26110090216",
+      "name": "VISHAVJEET KAMBOJ",
+      "email": "vishavjeet_kamboj@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 12,
+      "rollNumber": "AP26110090217",
+      "name": "INAMPUDI YASHAS",
+      "email": "inampudi_yashas@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 13,
+      "rollNumber": "AP26110090218",
+      "name": "SAKHINALA LAHARI VENKATA DHANA KUMARI",
+      "email": "sakhinala_lahari@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 14,
+      "rollNumber": "AP26110090219",
+      "name": "RAMA DAKSHATHA",
+      "email": "rama_dakshatha@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 15,
+      "rollNumber": "AP26110090220",
+      "name": "KOTA ASHISH",
+      "email": "kota_ashish@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 16,
+      "rollNumber": "AP26110090221",
+      "name": "KAMISETTY THANISHKA",
+      "email": "kamisetty_thanishka@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 17,
+      "rollNumber": "AP26110090223",
+      "name": "GORIPATI SAI VENKATA AJAY",
+      "email": "goripati_sai_venkata_ajay@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 18,
+      "rollNumber": "AP26110090224",
+      "name": "KARRE PRANEETHA SREE",
+      "email": "karre_praneetha_sree@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 19,
+      "rollNumber": "AP26110090225",
+      "name": "KOLA PREM VISHAL KRISHNA SAI",
+      "email": "kola_prem_vishal@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 20,
+      "rollNumber": "AP26110090226",
+      "name": "NAYANAPATI VENKAT KOWSHIK KUMAR GUPTA",
+      "email": "nayanapati_venkat_kowshik@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 21,
+      "rollNumber": "AP26110090227",
+      "name": "KRISHNA PANDEY",
+      "email": "krishna_pandey@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 22,
+      "rollNumber": "AP26110090228",
+      "name": "CHEEKATLA HARSHADEEP",
+      "email": "cheekatla_harshadeep@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 23,
+      "rollNumber": "AP26110090229",
+      "name": "JAHNAVI KATEPALLI",
+      "email": "jahnavi_katepalli@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 24,
+      "rollNumber": "AP26110090230",
+      "name": "ISHANT SINGH",
+      "email": "ishant_singh@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 25,
+      "rollNumber": "AP26110090231",
+      "name": "KODALI BHUVAN CHOWDARY",
+      "email": "kodali_bhuvan_chowdary@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 26,
+      "rollNumber": "AP26110090232",
+      "name": "GURRAM VENKATA SAI SANTHOSH GUPTA",
+      "email": "gurram_venkata_sai@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 27,
+      "rollNumber": "AP26110090233",
+      "name": "PULAVARTHI SOHAN SAM PRAJWAL",
+      "email": "pulavarthi_sohan_sam@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 28,
+      "rollNumber": "AP26110090234",
+      "name": "KONDRAGUNTA KUMAR SAI",
+      "email": "kondragunta_kumar_sai@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 29,
+      "rollNumber": "AP26110090235",
+      "name": "NELLURU VINAY KUMAR",
+      "email": "nelluru_vinay_kumar@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 30,
+      "rollNumber": "AP26110090236",
+      "name": "YALANATI LIKIL KUMAR",
+      "email": "yalanati_likil_kumar@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 31,
+      "rollNumber": "AP26110090237",
+      "name": "TRISHA VERMA",
+      "email": "trisha_verma@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 32,
+      "rollNumber": "AP26110090238",
+      "name": "VASAMSETTI SHYAM RISHITA",
+      "email": "vasamsetti_shyam_rishita@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 33,
+      "rollNumber": "AP26110090239",
+      "name": "JONNALAGADDA SAI SANJANA",
+      "email": "jonnalagadda_sai_sanjana@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 34,
+      "rollNumber": "AP26110090241",
+      "name": "G S MRINAL",
+      "email": "gs_mrinal@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 35,
+      "rollNumber": "AP26110090242",
+      "name": "SAIPA MANI HARSHITH",
+      "email": "saipa_mani_harshith@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 36,
+      "rollNumber": "AP26110090243",
+      "name": "SODISETTY SRI KRISHNA SAI RAGHAVA",
+      "email": "sodisetty_sri_krishna@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 37,
+      "rollNumber": "AP26110090244",
+      "name": "VAIBHAV KUMAR JHA",
+      "email": "vaibhav_kumar_jha@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 38,
+      "rollNumber": "AP26110090245",
+      "name": "KOLLI MEGHANA REDDY",
+      "email": "kolli_meghana_reddy@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 39,
+      "rollNumber": "AP26110090246",
+      "name": "PATHURI SAKETH",
+      "email": "pathuri_saketh@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 40,
+      "rollNumber": "AP26110090247",
+      "name": "MATLAKUNTA VENKATA VARSHITHA",
+      "email": "matlakunta_venkata@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 41,
+      "rollNumber": "AP26110090248",
+      "name": "NANDYALA NAVYASRI",
+      "email": "nandyala_navyasri@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 42,
+      "rollNumber": "AP26110090249",
+      "name": "DHARANI S R",
+      "email": "dharani_sr@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 43,
+      "rollNumber": "AP26110090250",
+      "name": "AVULA GIRIDHAR",
+      "email": "avula_giridhar@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 44,
+      "rollNumber": "AP26110090251",
+      "name": "MARAMREDDY ESWAR REDDY",
+      "email": "maramreddy_eswar_reddy@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 45,
+      "rollNumber": "AP26110090252",
+      "name": "KANAPARTHI SPANITH",
+      "email": "kanaparthi_spanith@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 46,
+      "rollNumber": "AP26110090253",
+      "name": "GUNTI MANOJKUMAR",
+      "email": "gunti_manojkumar@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 47,
+      "rollNumber": "AP26110090254",
+      "name": "METLAPALLI PAVAN KUMAR",
+      "email": "metlapalli_pavan_kumar@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 48,
+      "rollNumber": "AP26110090255",
+      "name": "SAJJA VAGDEVI",
+      "email": "sajja_vagdevi@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 49,
+      "rollNumber": "AP26110090256",
+      "name": "KUNCHALA SNEHALATHA",
+      "email": "kunchala_snehalatha@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 50,
+      "rollNumber": "AP26110090257",
+      "name": "SAKHINALA LIKHITHA VENKATA MANI KUMARI",
+      "email": "sakhinala_likhitha@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 51,
+      "rollNumber": "AP26110090258",
+      "name": "DAMARLA DHANASMI KRISHNA",
+      "email": "damarla_dhanasmi_krishna@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 52,
+      "rollNumber": "AP26110090259",
+      "name": "REDDY SRI SURYA HASITH",
+      "email": "reddy_sri_surya_hasith@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 53,
+      "rollNumber": "AP26110090260",
+      "name": "THOTA DINDU SUDHA SREE VALLI",
+      "email": "thota_dindu_sudha@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 54,
+      "rollNumber": "AP26110090261",
+      "name": "SINGH NAINAKUMARI MUKESH KUMAR",
+      "email": "singh_nainakumari@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 55,
+      "rollNumber": "AP26110090262",
+      "name": "SAI KOUSIK KATRAGADDA",
+      "email": "sai_kousik_katragadda@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 56,
+      "rollNumber": "AP26110090263",
+      "name": "GUDIVADA JOTHI NAGA SAI SREEMAYEE",
+      "email": "gudivada_jothi_naga@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 57,
+      "rollNumber": "AP26110090264",
+      "name": "SURAJ VISHWAKARMA",
+      "email": "suraj_vishwakarma@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
+    },
+    {
+      "id": 58,
+      "rollNumber": "AP26110090265",
+      "name": "AVIGAYAN JANA",
+      "email": "avigayan_jana@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "CR"
+    }
+  ],
+  "surveys": [],
+  "otps": [],
+  "users": [
+    {
+      "email": "cr.csed@srmap.edu.in",
+      "name": "CYBEX D - Class Representative",
+      "role": "student",
+      "createdAt": "2026-09-23T18:49:57.575Z"
+    },
+    {
+      "email": "avigayan_jana@srmap.edu.in",
+      "name": "AVIGAYAN JANA",
+      "role": "admin",
+      "createdAt": "2026-09-23T18:56:30.772Z",
+      "rollNumber": "AP26110090265",
+      "section": "D",
+      "batch": "2024-2028"
+    },
+    {
+      "email": "student.demo@srmap.edu.in",
+      "name": "Demo Student (CSE-D)",
+      "role": "student",
+      "createdAt": "2026-09-23T18:59:33.011Z"
+    },
+    {
+      "email": "rahul_sharma@srmap.edu.in",
+      "name": "Rahul Sharma",
+      "role": "student",
+      "createdAt": "2026-09-24T19:38:40.555Z"
+    }
+  ]
+}

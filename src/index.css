@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply bg-black text-white min-h-screen antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: #000000 !important;
+  }
+}
+
+/* Minimalist Single-Tone Ice-Cyan Liquid Glass with Subtle Corner Accents & Hover Pop */
+.liquid-glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.02),
+    0 20px 40px -15px rgba(0, 0, 0, 0.95);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* Subtle corner gradient (Single light ice-cyan tone - slightly visible) */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.09) 0%, transparent 45%);
+  opacity: 0.6;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s ease;
+  z-index: 0;
+}
+
+.liquid-glass:hover {
+  border-color: rgba(56, 189, 248, 0.22);
+  box-shadow: 
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.3),
+    0 25px 50px -10px rgba(0, 0, 0, 1),
+    0 0 16px -4px rgba(56, 189, 248, 0.15);
+  transform: translateY(-2px);
+}
+
+.liquid-glass:hover::before {
+  opacity: 0.9;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.24) 0%, transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.18) 0%, transparent 55%);
+}
+
+.liquid-glass-interactive {
+  position: relative;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.02),
+    0 20px 40px -15px rgba(0, 0, 0, 0.95);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.liquid-glass-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.10) 0%, transparent 45%);
+  opacity: 0.65;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s ease;
+  z-index: 0;
+}
+
+.liquid-glass-interactive:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow: 
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.04),
+    0 28px 55px -10px rgba(0, 0, 0, 1),
+    0 0 18px -4px rgba(56, 189, 248, 0.2);
+  transform: translateY(-3px) scale(1.012);
+}
+
+.liquid-glass-interactive:hover::before {
+  opacity: 0.95;
+  transform: scale(1.015);
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.28) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.22) 0%, transparent 60%);
+}
+
+.liquid-glass-pill {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    0 8px 16px -4px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.liquid-glass-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%);
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+  z-index: 0;
+}
+
+.liquid-glass-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+    0 10px 20px -4px rgba(0, 0, 0, 0.85),
+    0 0 12px -3px rgba(56, 189, 248, 0.18);
+  transform: translateY(-1.5px) scale(1.015);
+}
+
+.liquid-glass-pill:hover::before {
+  opacity: 0.9;
+  background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.25) 0%, transparent 65%);
+}
+
+.liquid-glass > *,
+.liquid-glass-interactive > *,
+.liquid-glass-pill > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Minimal Top Edge Cyan Beam */
+.liquid-glass::after,
+.liquid-glass-interactive::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4) 50%, transparent);
+  opacity: 0.25;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.liquid-glass:hover::after,
+.liquid-glass-interactive:hover::after {
+  left: 10%;
+  right: 10%;
+  opacity: 0.55;
+  height: 1px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+/* 3D Perspective and Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.perspective-1500 {
+  perspective: 1500px;
+}
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+.translate-z-40 {
+  transform: translateZ(40px);
+}
+
+/* Monochrome High-Contrast Glows */
+.card-mono-glow {
+  box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.08),
+              0 0 15px 0px rgba(255, 255, 255, 0.05),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.card-active-glow {
+  box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.25),
+              0 0 25px 2px rgba(255, 255, 255, 0.15),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Custom Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Selection */
+::selection {
+  background: #ffffff;
+  color: #000000;
+}
