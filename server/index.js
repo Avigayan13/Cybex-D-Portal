@@ -10,10 +10,15 @@ import { sendOtpEmail } from './emailService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const UPLOADS_DIR = path.join(__dirname, '../uploads');
+const IS_VERCEL = Boolean(process.env.VERCEL);
+const UPLOADS_DIR = IS_VERCEL ? '/tmp/uploads' : path.join(__dirname, '../uploads');
 
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn('[SERVER] Uploads dir notice:', err.message);
 }
 
 // Multer storage for uploaded files
@@ -37,6 +42,15 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Normalize route paths in serverless environment
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/api') && !req.url.startsWith('/uploads')) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
+
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(authenticate);
 

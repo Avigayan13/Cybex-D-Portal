@@ -9,3 +9,6 @@ yarn-debug.log*
 *.log
 .DS_Store
 Thumbs.db
+
+.vite
+scratch

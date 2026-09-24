@@ -35,6 +35,16 @@ export function DataProvider({ children }) {
     return () => clearInterval(timer);
   }, []);
 
+  // Safe JSON helper to prevent syntax crashes
+  const parseSafe = async (res) => {
+    try {
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  };
+
   // Fetch public and authenticated data
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -48,29 +58,29 @@ export function DataProvider({ children }) {
         fetch('/api/surveys/stats')
       ]);
 
-      if (annRes.ok) setAnnouncements(await annRes.json());
-      if (ttRes.ok) setTimetable(await ttRes.json());
-      if (matRes.ok) setMaterials(await matRes.json());
-      if (dbtRes.ok) setDoubtsList(await dbtRes.json());
-      if (stuRes.ok) setStudentsList(await stuRes.json());
-      if (srvRes.ok) setSurveyStats(await srvRes.json());
+      if (annRes.ok) { const d = await parseSafe(annRes); if (d) setAnnouncements(d); }
+      if (ttRes.ok) { const d = await parseSafe(ttRes); if (d) setTimetable(d); }
+      if (matRes.ok) { const d = await parseSafe(matRes); if (d) setMaterials(d); }
+      if (dbtRes.ok) { const d = await parseSafe(dbtRes); if (d) setDoubtsList(d); }
+      if (stuRes.ok) { const d = await parseSafe(stuRes); if (d) setStudentsList(d); }
+      if (srvRes.ok) { const d = await parseSafe(srvRes); if (d) setSurveyStats(d); }
 
       if (token) {
         const [fbRes, srvStatusRes] = await Promise.all([
           fetch('/api/feedback', { headers: { 'Authorization': `Bearer ${token}` } }),
           fetch('/api/surveys/my-status', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
-        if (fbRes.ok) setFeedbackList(await fbRes.json());
+        if (fbRes.ok) { const d = await parseSafe(fbRes); if (d) setFeedbackList(d); }
         if (srvStatusRes.ok) {
-          const srvData = await srvStatusRes.json();
-          setUserSurveySubmitted(Boolean(srvData.submitted));
+          const srvData = await parseSafe(srvStatusRes);
+          if (srvData) setUserSurveySubmitted(Boolean(srvData.submitted));
         }
 
         if (user?.role === 'admin') {
           const stRes = await fetch('/api/admin/stats', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-          if (stRes.ok) setStats(await stRes.json());
+          if (stRes.ok) { const d = await parseSafe(stRes); if (d) setStats(d); }
         }
       } else {
         setFeedbackList([]);
@@ -78,11 +88,11 @@ export function DataProvider({ children }) {
         setStats(null);
       }
     } catch (err) {
-      console.error('Error fetching data:', err);
+      console.error('Data fetch error:', err);
     } finally {
       setLoading(false);
     }
-  }, [token, user]);
+  }, [token, user?.role]);
 
   useEffect(() => {
     fetchData();

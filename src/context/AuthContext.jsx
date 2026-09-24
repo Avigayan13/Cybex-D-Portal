@@ -13,12 +13,25 @@ export function AuthProvider({ children }) {
     academicYear: "2025-2026 (Semester IV)"
   });
 
+  // Safe JSON helper to handle non-JSON responses gracefully
+  const safeJson = async (res) => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      if (!res.ok) {
+        throw new Error(`Server returned error (${res.status}). Please check API credentials or connection.`);
+      }
+      throw new Error('Received unexpected non-JSON response from server.');
+    }
+  };
+
   // Fetch initial portal configuration
   useEffect(() => {
     fetch('/api/config')
-      .then(res => res.json())
+      .then(safeJson)
       .then(data => {
-        if (data) setPortalConfig(data);
+        if (data && data.adminEmail) setPortalConfig(data);
       })
       .catch(err => console.error('Error fetching config:', err));
   }, []);
@@ -31,7 +44,7 @@ export function AuthProvider({ children }) {
           'Authorization': `Bearer ${token}`
         }
       })
-      .then(res => res.json())
+      .then(safeJson)
       .then(data => {
         if (data && data.user) {
           setUser(data.user);
@@ -55,7 +68,7 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, name })
     });
-    const data = await res.json();
+    const data = await safeJson(res);
     if (!res.ok) {
       throw new Error(data.error || 'Failed to request OTP');
     }
@@ -68,7 +81,7 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, otp, name })
     });
-    const data = await res.json();
+    const data = await safeJson(res);
     if (!res.ok) {
       throw new Error(data.error || 'Failed to verify OTP');
     }
