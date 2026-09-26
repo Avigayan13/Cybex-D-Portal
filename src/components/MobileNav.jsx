@@ -17,8 +17,8 @@ export default function MobileNav({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'timetable', label: 'Timetable', icon: Calendar },
+    { id: 'materials', label: 'Class Vault', icon: BookOpen },
     { id: 'feedback', label: 'Feedback', icon: MessageSquarePlus },
-    { id: 'materials_disabled', label: 'Materials', icon: BookOpen, isDisabled: true },
   ];
 
   if (isAdmin) {

@@ -45,7 +45,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'timetable', label: 'Timetable', icon: Calendar, isHighlight: true },
     { id: 'feedback', label: 'Feedback & Grievances', icon: MessageSquarePlus },
-    { id: 'materials_disabled', label: 'Study Materials', icon: BookOpen, isDisabled: true },
+    { id: 'materials', label: 'Study Materials & Vault', icon: BookOpen },
     { id: 'doubts_disabled', label: 'Doubt Board', icon: HelpCircle, isDisabled: true },
   ];
 

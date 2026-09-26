@@ -11,6 +11,7 @@ import AuthPage from './pages/AuthPage';
 import StudentDashboard from './pages/StudentDashboard';
 import FeedbackPage from './pages/FeedbackPage';
 import TimetablePage from './pages/TimetablePage';
+import StudyMaterialsPage from './pages/StudyMaterialsPage';
 import AdminDashboard from './pages/AdminDashboard';
 
 function AppContent() {
@@ -70,6 +71,10 @@ function AppContent() {
 
         {activeTab === 'feedback' && (
           <FeedbackPage />
+        )}
+
+        {activeTab === 'materials' && (
+          <StudyMaterialsPage />
         )}
 
         {activeTab === 'admin' && (

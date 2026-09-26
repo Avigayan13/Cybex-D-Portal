@@ -138,27 +138,30 @@ export default function StudentDashboard({ onNavigate }) {
             </span>
           </button>
 
-          {/* Disabled 1: Study Materials */}
-          <div
-            onClick={() => setDisabledModalInfo('Study Materials Hub')}
-            className="liquid-glass-pill flex flex-col items-start p-6 rounded-3xl text-left cursor-pointer relative group opacity-60 hover:opacity-100"
+          {/* Active 3: Study Materials & Google Classroom Vault */}
+          <button
+            onClick={() => onNavigate('materials')}
+            className="liquid-glass-interactive flex flex-col items-start p-6 rounded-3xl text-left group cursor-pointer"
           >
-            <div className="w-12 h-12 rounded-2xl bg-white/5 text-zinc-400 flex items-center justify-center mb-4 border border-white/10">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/30 group-hover:scale-110 transition-transform shadow-lg">
               <BookOpen className="w-6 h-6" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-base font-bold text-zinc-300 block">Study Materials</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Locked
+              <span className="text-base font-bold text-white group-hover:text-indigo-200 transition block">
+                Class Vault & PDFs
+              </span>
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5" /> Live Sync
               </span>
             </div>
-            <span className="text-xs text-zinc-500 mt-1 block leading-relaxed">
-              Lecture notes & PYQs (Opening soon)
+            <span className="text-xs text-zinc-400 mt-1 block leading-relaxed">
+              Google Classroom notes, lecture PDFs & PYQs
             </span>
-            <span className="mt-4 text-[11px] font-bold text-zinc-400 flex items-center gap-1">
-              <span>Click to view status</span>
+            <span className="mt-4 text-xs font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              <span>Open Class Vault</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </span>
-          </div>
+          </button>
 
           {/* Disabled 2: Doubt Board */}
           <div
