@@ -14,7 +14,8 @@ import {
   FileCheck2,
   CheckCircle2,
   GraduationCap,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab }) {
@@ -47,14 +48,14 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
         <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between h-16 sm:h-20">
             
             {/* SRM AP Full Logo & CYBEX D Branding */}
             <div 
               onClick={() => setActiveTab('dashboard')} 
-              className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none group"
+              className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none group shrink-0"
             >
               <div className="h-10 sm:h-12 px-2.5 py-1 rounded-2xl bg-black border border-white/20 flex items-center justify-center shadow-2xl group-hover:border-white/40 transition-all">
                 <img 
@@ -85,7 +86,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-2">
+            <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2">
               {navItems.map(item => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -95,7 +96,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                     <button
                       key={item.id}
                       onClick={() => handleNavClick(item)}
-                      className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold text-zinc-500 hover:text-zinc-300 transition group opacity-70 hover:opacity-100"
+                      className="liquid-glass-pill flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-bold text-zinc-500 hover:text-zinc-300 transition group opacity-70 hover:opacity-100"
                       title="Temporarily locked by CR"
                     >
                       <Icon className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300" />
@@ -111,7 +112,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                    className={`flex items-center gap-2 px-3.5 xl:px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                       item.isSpecial
                         ? isActive
                           ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105'
@@ -126,7 +127,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                           : 'liquid-glass-interactive text-zinc-300 hover:text-white'
                         : isActive
                         ? 'liquid-glass-pill bg-white/20 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border-white/30'
-                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.05] rounded-2xl px-3.5 py-2'
+                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.05] rounded-2xl px-3 py-2'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -137,12 +138,12 @@ export default function Navbar({ activeTab, setActiveTab }) {
             </nav>
 
             {/* User Profile Dropdown */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 shrink-0">
               {user ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left border border-white/15 hover:border-white/30 transition shadow-lg"
+                    className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left border border-white/15 hover:border-white/30 transition shadow-lg cursor-pointer"
                   >
                     <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center text-xs font-black shadow-md">
                       {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
@@ -166,15 +167,16 @@ export default function Navbar({ activeTab, setActiveTab }) {
                     <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* Enhanced Student / CR Profile Card */}
+                  {/* Enhanced Student / CR Profile Card - Positioned Cleanly Below Header Button */}
                   {showProfileMenu && (
                     <>
                       <div 
-                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs" 
+                        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs" 
                         onClick={() => setShowProfileMenu(false)} 
                       />
-                      <div className="absolute right-0 mt-2 w-80 sm:w-88 liquid-glass bg-black/95 backdrop-blur-3xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] border border-white/20 p-4 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
-                        {/* Profile Header */}
+                      <div className="absolute right-0 top-full mt-3 w-80 sm:w-88 max-h-[calc(100vh-100px)] overflow-y-auto liquid-glass bg-black/95 backdrop-blur-3xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] border border-white/20 p-4 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
+                        
+                        {/* Profile Header Card */}
                         <div className="flex items-start gap-3 pb-3.5 border-b border-white/10">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-white to-zinc-300 text-black flex items-center justify-center text-base font-black shadow-xl shrink-0">
                             {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
@@ -182,7 +184,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                           <div className="overflow-hidden flex-1">
                             <div className="flex items-center gap-1.5">
                               <h3 className="text-sm font-black text-white truncate">{user.name || 'SRM AP Student'}</h3>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
                             </div>
                             <p className="text-xs text-zinc-400 font-mono tracking-wide truncate">{user.email}</p>
                             <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/15">
@@ -194,33 +196,33 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
                         {/* Verified Academic Credentials Info */}
                         <div className="py-3 space-y-2 border-b border-white/10 text-xs">
-                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
                             <span className="text-zinc-400 font-medium">Roll / Reg No:</span>
                             <span className="font-mono font-bold text-white tracking-wider">{rollNumber}</span>
                           </div>
-                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
                             <span className="text-zinc-400 font-medium">Class & Section:</span>
                             <span className="font-bold text-white">CSE • Section D</span>
                           </div>
-                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
                             <span className="text-zinc-400 font-medium">Batch / Program:</span>
                             <span className="font-bold text-zinc-300">B.Tech 2024–2028</span>
                           </div>
-                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
                             <span className="text-zinc-400 font-medium">Campus:</span>
                             <span className="font-bold text-zinc-300">SRM University-AP</span>
                           </div>
                         </div>
 
                         {/* Actions */}
-                        <div className="pt-3 space-y-1.5">
+                        <div className="pt-3 space-y-2">
                           {isAdmin ? (
                             <button
                               onClick={() => {
                                 setActiveTab('admin');
                                 setShowProfileMenu(false);
                               }}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black text-black bg-white hover:bg-zinc-200 rounded-xl transition shadow-lg"
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black text-black bg-white hover:bg-zinc-200 rounded-xl transition shadow-lg cursor-pointer"
                             >
                               <ShieldCheck className="w-4 h-4 text-black" />
                               <span>Open CR Control Panel</span>
@@ -231,7 +233,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                                 setActiveTab('exams');
                                 setShowProfileMenu(false);
                               }}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white liquid-glass-pill hover:bg-white/15 rounded-xl transition"
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white liquid-glass-pill hover:bg-white/15 rounded-xl transition cursor-pointer"
                             >
                               <FileCheck2 className="w-4 h-4 text-amber-400" />
                               <span>View Exams & Syllabus</span>
@@ -243,7 +245,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                               logout();
                               setShowProfileMenu(false);
                             }}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-rose-500/20"
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-rose-500/20 cursor-pointer"
                           >
                             <LogOut className="w-4 h-4" />
                             <span>Sign Out of Portal</span>
