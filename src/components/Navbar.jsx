@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import DisabledNoticeModal from './DisabledNoticeModal';
 import { 
@@ -7,45 +7,29 @@ import {
   ShieldCheck, 
   LogOut, 
   ChevronDown, 
-  SlidersHorizontal,
   Calendar,
-  Box,
   BookOpen,
   HelpCircle,
   Lock,
-  Maximize2,
-  Minimize2
+  FileCheck2,
+  CheckCircle2,
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab }) {
-  const { user, logout, switchRole, portalConfig, isAdmin } = useAuth();
-  const [showRoleMenu, setShowRoleMenu] = useState(false);
+  const { user, logout, isAdmin } = useAuth();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [disabledModalInfo, setDisabledModalInfo] = useState(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((e) => console.log(e));
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch((e) => console.log(e));
-      }
-    }
-  };
+  const rollNumber = user?.rollNumber || user?.regNo || user?.rollNo || (isAdmin ? 'AP26110090265' : 'AP26110090269');
 
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'timetable', label: 'Timetable', icon: Calendar, isHighlight: true },
-    { id: 'feedback', label: 'Feedback & Grievances', icon: MessageSquarePlus },
-    { id: 'materials', label: 'Study Materials & Vault', icon: BookOpen },
+    { id: 'exams', label: 'Exams & Tests', icon: FileCheck2, isSpecialNotice: true },
+    { id: 'materials', label: 'Class Vault & Sync', icon: BookOpen },
+    { id: 'feedback', label: 'Grievance Desk', icon: MessageSquarePlus },
     { id: 'doubts_disabled', label: 'Doubt Board', icon: HelpCircle, isDisabled: true },
   ];
 
@@ -63,7 +47,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+      <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
         <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between h-16 sm:h-20">
             
@@ -100,7 +84,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
               </div>
             </div>
 
-            {/* Desktop Navigation Links with Liquid Glass Design */}
+            {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-2">
               {navItems.map(item => {
                 const Icon = item.icon;
@@ -132,6 +116,10 @@ export default function Navbar({ activeTab, setActiveTab }) {
                         ? isActive
                           ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105'
                           : 'liquid-glass-pill text-zinc-300 hover:text-white border-white/20 hover:border-white/40'
+                        : item.isSpecialNotice
+                        ? isActive
+                          ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.35)] scale-105'
+                          : 'liquid-glass-interactive text-amber-300 hover:text-white'
                         : item.isHighlight
                         ? isActive
                           ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.35)] scale-105'
@@ -148,113 +136,117 @@ export default function Navbar({ activeTab, setActiveTab }) {
               })}
             </nav>
 
-            {/* Actions: Fullscreen Button & User Profile */}
+            {/* User Profile Dropdown */}
             <div className="flex items-center gap-2.5">
-              {/* Fullscreen Toggle Button */}
-              <button
-                onClick={toggleFullscreen}
-                className="liquid-glass-pill p-2.5 rounded-2xl text-zinc-400 hover:text-white hover:border-white/30 transition flex items-center gap-1.5"
-                title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
-              >
-                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                <span className="text-[11px] font-bold hidden md:inline">{isFullscreen ? 'Exit Fullscreen' : 'Full Screen'}</span>
-              </button>
-
               {user ? (
                 <div className="relative">
                   <button
-                    onClick={() => setShowRoleMenu(!showRoleMenu)}
-                    className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left"
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left border border-white/15 hover:border-white/30 transition shadow-lg"
                   >
                     <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center text-xs font-black shadow-md">
-                      {isAdmin ? 'CR' : user.name ? user.name.charAt(0) : 'S'}
+                      {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
                     </div>
                     
-                    <div className="hidden lg:block text-left">
-                      <p className="text-xs font-bold text-white leading-tight truncate max-w-[120px]">
+                    <div className="hidden sm:block text-left">
+                      <p className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
                         {user.name || user.email.split('@')[0]}
                       </p>
                       <p className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
                         {isAdmin ? (
-                          <span className="text-white">Class Rep (Admin)</span>
+                          <span className="text-emerald-400 flex items-center gap-0.5">
+                            <Sparkles className="w-2.5 h-2.5" /> Class Rep (Admin)
+                          </span>
                         ) : (
-                          <span className="text-zinc-400">Student</span>
+                          <span className="text-zinc-400">{rollNumber}</span>
                         )}
                       </p>
                     </div>
 
-                    <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                    <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* Role Switcher & Account Dropdown with Liquid Glass */}
-                  {showRoleMenu && (
+                  {/* Enhanced Student / CR Profile Card */}
+                  {showProfileMenu && (
                     <>
                       <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setShowRoleMenu(false)} 
+                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs" 
+                        onClick={() => setShowProfileMenu(false)} 
                       />
-                      <div className="absolute right-0 mt-2 w-64 liquid-glass bg-black/90 backdrop-blur-3xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] border border-white/15 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
-                        <div className="px-3 py-2 border-b border-white/10 mb-2">
-                          <p className="text-xs font-bold text-white">{user.name}</p>
-                          <p className="text-[11px] text-zinc-400 truncate">{user.email}</p>
-                          <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg liquid-glass text-white uppercase border border-white/15">
-                            Role: {user.role}
-                          </span>
-                        </div>
-
-                        {/* Quick Role Switcher */}
-                        <div className="px-3 py-1.5">
-                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                            <SlidersHorizontal className="w-3 h-3" /> Quick Switch Role
-                          </p>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            <button
-                              onClick={() => {
-                                switchRole('student');
-                                setShowRoleMenu(false);
-                              }}
-                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition text-center ${
-                                !isAdmin ? 'bg-white text-black shadow-md' : 'liquid-glass-pill hover:bg-white/10 text-zinc-300'
-                              }`}
-                            >
-                              Student
-                            </button>
-                            <button
-                              onClick={() => {
-                                switchRole('admin');
-                                setShowRoleMenu(false);
-                              }}
-                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition text-center ${
-                                isAdmin ? 'bg-white text-black shadow-md' : 'liquid-glass-pill hover:bg-white/10 text-zinc-300'
-                              }`}
-                            >
-                              CR Admin
-                            </button>
+                      <div className="absolute right-0 mt-2 w-80 sm:w-88 liquid-glass bg-black/95 backdrop-blur-3xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] border border-white/20 p-4 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
+                        {/* Profile Header */}
+                        <div className="flex items-start gap-3 pb-3.5 border-b border-white/10">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-white to-zinc-300 text-black flex items-center justify-center text-base font-black shadow-xl shrink-0">
+                            {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                          </div>
+                          <div className="overflow-hidden flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="text-sm font-black text-white truncate">{user.name || 'SRM AP Student'}</h3>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
+                            </div>
+                            <p className="text-xs text-zinc-400 font-mono tracking-wide truncate">{user.email}</p>
+                            <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/15">
+                              <GraduationCap className="w-3 h-3" />
+                              {isAdmin ? 'Class Representative (CR)' : 'Enrolled Student'}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="border-t border-white/10 mt-2 pt-2 space-y-1">
-                          {isAdmin && (
+                        {/* Verified Academic Credentials Info */}
+                        <div className="py-3 space-y-2 border-b border-white/10 text-xs">
+                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                            <span className="text-zinc-400 font-medium">Roll / Reg No:</span>
+                            <span className="font-mono font-bold text-white tracking-wider">{rollNumber}</span>
+                          </div>
+                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                            <span className="text-zinc-400 font-medium">Class & Section:</span>
+                            <span className="font-bold text-white">CSE • Section D</span>
+                          </div>
+                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                            <span className="text-zinc-400 font-medium">Batch / Program:</span>
+                            <span className="font-bold text-zinc-300">B.Tech 2024–2028</span>
+                          </div>
+                          <div className="flex items-center justify-between py-1 px-2.5 rounded-xl bg-white/[0.04]">
+                            <span className="text-zinc-400 font-medium">Campus:</span>
+                            <span className="font-bold text-zinc-300">SRM University-AP</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="pt-3 space-y-1.5">
+                          {isAdmin ? (
                             <button
                               onClick={() => {
                                 setActiveTab('admin');
-                                setShowRoleMenu(false);
+                                setShowProfileMenu(false);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-white/10 rounded-xl transition"
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black text-black bg-white hover:bg-zinc-200 rounded-xl transition shadow-lg"
                             >
-                              <ShieldCheck className="w-4 h-4 text-white" />
+                              <ShieldCheck className="w-4 h-4 text-black" />
                               <span>Open CR Control Panel</span>
                             </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setActiveTab('exams');
+                                setShowProfileMenu(false);
+                              }}
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white liquid-glass-pill hover:bg-white/15 rounded-xl transition"
+                            >
+                              <FileCheck2 className="w-4 h-4 text-amber-400" />
+                              <span>View Exams & Syllabus</span>
+                            </button>
                           )}
+
                           <button
                             onClick={() => {
                               logout();
-                              setShowRoleMenu(false);
+                              setShowProfileMenu(false);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-rose-500/20"
                           >
                             <LogOut className="w-4 h-4" />
-                            <span>Sign Out</span>
+                            <span>Sign Out of Portal</span>
                           </button>
                         </div>
                       </div>

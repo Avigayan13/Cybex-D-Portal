@@ -17,7 +17,24 @@ export function DataProvider({ children }) {
     );
   };
 
-  const [announcements, setAnnouncements] = useState([]);
+  const [announcements, setAnnouncements] = useState(() => {
+    try {
+      const cached = localStorage.getItem('srmap_announcements');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [exams, setExams] = useState(() => {
+    try {
+      const cached = localStorage.getItem('srmap_exams');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [timetable, setTimetable] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [classroomFeed, setClassroomFeed] = useState(() => {
@@ -78,8 +95,9 @@ export function DataProvider({ children }) {
       const localTokens = localStorage.getItem('srmap_gc_tokens');
       const gcHeaders = localTokens ? { 'x-classroom-tokens': localTokens } : {};
 
-      const [annRes, ttRes, matRes, dbtRes, stuRes, srvRes, gcRes, gcStatusRes] = await Promise.all([
+      const [annRes, exRes, ttRes, matRes, dbtRes, stuRes, srvRes, gcRes, gcStatusRes] = await Promise.all([
         fetch('/api/announcements'),
+        fetch('/api/exams'),
         fetch('/api/timetable'),
         fetch('/api/materials'),
         fetch('/api/doubts'),
@@ -89,7 +107,42 @@ export function DataProvider({ children }) {
         fetch('/api/classroom/status', { headers: gcHeaders })
       ]);
 
-      if (annRes.ok) { const d = await parseSafe(annRes); if (d) setAnnouncements(d); }
+      // Announcements caching & merging
+      if (annRes.ok) { 
+        const d = await parseSafe(annRes); 
+        if (d && Array.isArray(d)) {
+          const cachedLocal = JSON.parse(localStorage.getItem('srmap_announcements') || '[]');
+          const map = new Map();
+          for (const item of d) map.set(item.id, item);
+          for (const item of cachedLocal) {
+            if (!map.has(item.id)) map.set(item.id, item);
+          }
+          const merged = Array.from(map.values()).sort((a, b) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          setAnnouncements(merged);
+          try { localStorage.setItem('srmap_announcements', JSON.stringify(merged)); } catch {}
+        }
+      }
+
+      // Exams caching & merging
+      if (exRes.ok) {
+        const d = await parseSafe(exRes);
+        if (d && Array.isArray(d)) {
+          const cachedLocal = JSON.parse(localStorage.getItem('srmap_exams') || '[]');
+          const map = new Map();
+          for (const item of d) map.set(item.id, item);
+          for (const item of cachedLocal) {
+            if (!map.has(item.id)) map.set(item.id, item);
+          }
+          const merged = Array.from(map.values()).sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+          setExams(merged);
+          try { localStorage.setItem('srmap_exams', JSON.stringify(merged)); } catch {}
+        }
+      }
+
       if (ttRes.ok) { const d = await parseSafe(ttRes); if (d) setTimetable(d); }
       if (matRes.ok) { const d = await parseSafe(matRes); if (d) setMaterials(d); }
       if (dbtRes.ok) { const d = await parseSafe(dbtRes); if (d) setDoubtsList(d); }
@@ -149,6 +202,48 @@ export function DataProvider({ children }) {
     fetchData();
   }, [fetchData]);
 
+  // Automatic Background Classroom Feed Sync on Mount & Every 90 Seconds
+  useEffect(() => {
+    const autoSync = async () => {
+      try {
+        let localTokens = null;
+        const raw = localStorage.getItem('srmap_gc_tokens');
+        if (raw) localTokens = JSON.parse(raw);
+
+        const res = await fetch('/api/classroom/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(localTokens ? { 'x-classroom-tokens': JSON.stringify(localTokens) } : {})
+          },
+          body: JSON.stringify({ tokens: localTokens })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.items && Array.isArray(data.items)) {
+            const cleaned = cleanFeedItems(data.items);
+            setClassroomFeed(cleaned);
+            try { localStorage.setItem('srmap_gc_feed', JSON.stringify(cleaned)); } catch {}
+          }
+        }
+      } catch (err) {
+        console.log('[AUTO-SYNC] Background sync notice:', err.message);
+      }
+    };
+
+    // Initial background auto-sync after 1.5 seconds
+    const initialTimer = setTimeout(autoSync, 1500);
+
+    // Periodic auto-sync every 90 seconds
+    const intervalTimer = setInterval(autoSync, 90000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalTimer);
+    };
+  }, []);
+
   // Handle OAuth callback tokens from URL params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -177,7 +272,7 @@ export function DataProvider({ children }) {
     }
   }, []);
 
-  // Compute Live Class Status based on current time & timetable (Shows Hours & Minutes)
+  // Compute Live Class Status based on current time & timetable
   useEffect(() => {
     if (!timetable || timetable.length === 0) return;
 
@@ -195,7 +290,6 @@ export function DataProvider({ children }) {
       return;
     }
 
-    // Get today's classes sorted by start time
     const todayClasses = timetable
       .filter(t => t.day.toLowerCase() === currentDayName.toLowerCase())
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -243,7 +337,6 @@ export function DataProvider({ children }) {
       }
     }
 
-    // Format helper to show Hours, Minutes, and Seconds
     const formatDuration = (totalSeconds) => {
       const hrs = Math.floor(totalSeconds / 3600);
       const mins = Math.floor((totalSeconds % 3600) / 60);
@@ -308,29 +401,61 @@ export function DataProvider({ children }) {
     return updated;
   };
 
-  // Actions for Announcements (CR Admin)
+  // Actions for Announcements (CR Admin) - Persistent Local & Backend Sync
   const addAnnouncement = async (annData) => {
-    const res = await fetch('/api/announcements', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(annData)
+    let newAnn = null;
+    try {
+      const res = await fetch('/api/announcements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(annData)
+      });
+      if (res.ok) {
+        newAnn = await res.json();
+      }
+    } catch (e) {
+      console.warn('Backend announcement save notice:', e);
+    }
+
+    if (!newAnn) {
+      newAnn = {
+        id: `ann-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        isPinned: Boolean(annData.isPinned),
+        priority: annData.priority || 'Normal',
+        category: annData.category || 'General',
+        title: annData.title,
+        content: annData.content,
+        authorName: user?.name || "CYBEX D - Class Representative"
+      };
+    }
+
+    setAnnouncements(prev => {
+      const updated = [newAnn, ...prev.filter(a => a.id !== newAnn.id)];
+      try { localStorage.setItem('srmap_announcements', JSON.stringify(updated)); } catch {}
+      return updated;
     });
-    if (!res.ok) throw new Error('Failed to post announcement');
-    const newAnn = await res.json();
-    setAnnouncements(prev => [newAnn, ...prev]);
+
     return newAnn;
   };
 
   const deleteAnnouncement = async (id) => {
-    const res = await fetch(`/api/announcements/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
+    try {
+      await fetch(`/api/announcements/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (e) {
+      console.warn('Backend delete announcement notice:', e);
+    }
+    setAnnouncements(prev => {
+      const updated = prev.filter(a => a.id !== id);
+      try { localStorage.setItem('srmap_announcements', JSON.stringify(updated)); } catch {}
+      return updated;
     });
-    if (!res.ok) throw new Error('Failed to delete announcement');
-    setAnnouncements(prev => prev.filter(a => a.id !== id));
   };
 
   const deleteFeedback = async (id) => {
@@ -340,6 +465,90 @@ export function DataProvider({ children }) {
     });
     if (!res.ok) throw new Error('Failed to delete feedback');
     setFeedbackList(prev => prev.filter(f => f.id !== id));
+  };
+
+  // Actions for Exams & Tests (CR Admin)
+  const addExam = async (examData) => {
+    let newExam = null;
+    try {
+      const res = await fetch('/api/exams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(examData)
+      });
+      if (res.ok) {
+        newExam = await res.json();
+      }
+    } catch (e) {
+      console.warn('Backend exam notice:', e);
+    }
+
+    if (!newExam) {
+      newExam = {
+        id: `exam-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        publishedBy: user?.name || "CYBEX D - Class Representative",
+        ...examData
+      };
+    }
+
+    setExams(prev => {
+      const updated = [newExam, ...prev.filter(e => e.id !== newExam.id)].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+      try { localStorage.setItem('srmap_exams', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+
+    return newExam;
+  };
+
+  const updateExam = async (id, examData) => {
+    try {
+      const res = await fetch(`/api/exams/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(examData)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setExams(prev => {
+          const updated = prev.map(e => e.id === id ? data : e);
+          try { localStorage.setItem('srmap_exams', JSON.stringify(updated)); } catch {}
+          return updated;
+        });
+        return data;
+      }
+    } catch (e) {
+      console.warn('Backend update exam notice:', e);
+    }
+
+    setExams(prev => {
+      const updated = prev.map(e => e.id === id ? { ...e, ...examData, updatedAt: new Date().toISOString() } : e);
+      try { localStorage.setItem('srmap_exams', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  };
+
+  const deleteExam = async (id) => {
+    try {
+      await fetch(`/api/exams/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (e) {
+      console.warn('Backend delete exam notice:', e);
+    }
+    setExams(prev => {
+      const updated = prev.filter(e => e.id !== id);
+      try { localStorage.setItem('srmap_exams', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
   };
 
   // Actions for Students (CR Admin)
@@ -424,8 +633,9 @@ export function DataProvider({ children }) {
     if (!res.ok) throw new Error(data.error || 'Failed to sync Google Classroom');
     
     if (data.items && Array.isArray(data.items)) {
-      setClassroomFeed(data.items);
-      try { localStorage.setItem('srmap_gc_feed', JSON.stringify(data.items)); } catch {}
+      const cleaned = cleanFeedItems(data.items);
+      setClassroomFeed(cleaned);
+      try { localStorage.setItem('srmap_gc_feed', JSON.stringify(cleaned)); } catch {}
     }
 
     setClassroomStatus(prev => ({
@@ -452,6 +662,7 @@ export function DataProvider({ children }) {
   const disconnectGoogleClassroom = async () => {
     localStorage.removeItem('srmap_gc_tokens');
     localStorage.removeItem('srmap_gc_refresh_token');
+    localStorage.removeItem('srmap_gc_feed');
     
     if (token) {
       try {
@@ -464,6 +675,7 @@ export function DataProvider({ children }) {
       }
     }
     
+    setClassroomFeed([]);
     setClassroomStatus(prev => ({ ...prev, isConnected: false }));
     fetchData();
   };
@@ -471,6 +683,7 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       announcements,
+      exams,
       timetable,
       materials,
       classroomFeed,
@@ -493,6 +706,9 @@ export function DataProvider({ children }) {
       deleteFeedback,
       addAnnouncement,
       deleteAnnouncement,
+      addExam,
+      updateExam,
+      deleteExam,
       addStudent,
       updateStudent,
       deleteStudent,

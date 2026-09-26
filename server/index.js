@@ -373,6 +373,53 @@ app.delete('/api/materials/:id', requireAdmin, (req, res) => {
 });
 
 // ==========================================
+// EXAMS, TESTS & SYLLABUS NOTICES ROUTES
+// ==========================================
+
+app.get('/api/exams', (req, res) => {
+  res.json(Database.getExams());
+});
+
+app.post('/api/exams', requireAdmin, (req, res) => {
+  const { title, subject, subjectCode, examType, date, time, duration, venue, syllabus, instructions, totalMarks, weightage, isUrgent, revisionDocUrl } = req.body;
+  if (!title || !subject || !date) {
+    return res.status(400).json({ error: "Exam title, subject, and date are required." });
+  }
+
+  const item = Database.createExam({
+    title,
+    subject,
+    subjectCode: subjectCode || "",
+    examType: examType || "Mid-Term",
+    date,
+    time: time || "10:00 AM",
+    duration: duration || "1.5 Hours",
+    venue: venue || "S 312",
+    syllabus: syllabus || "",
+    instructions: instructions || "",
+    totalMarks: totalMarks || "50",
+    weightage: weightage || "25%",
+    isUrgent: Boolean(isUrgent),
+    revisionDocUrl: revisionDocUrl || "",
+    publishedBy: req.user.name || "Class Representative"
+  });
+
+  res.status(201).json(item);
+});
+
+app.put('/api/exams/:id', requireAdmin, (req, res) => {
+  const updated = Database.updateExam(req.params.id, req.body);
+  if (!updated) return res.status(404).json({ error: "Exam schedule not found" });
+  res.json(updated);
+});
+
+app.delete('/api/exams/:id', requireAdmin, (req, res) => {
+  const ok = Database.deleteExam(req.params.id);
+  if (!ok) return res.status(404).json({ error: "Exam schedule not found" });
+  res.json({ success: true });
+});
+
+// ==========================================
 // FEEDBACK & PROBLEMS ROUTES
 // ==========================================
 

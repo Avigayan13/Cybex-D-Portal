@@ -10,19 +10,21 @@ import {
   ArrowRight, 
   ShieldCheck, 
   Calendar,
-  Box, 
   BookOpen, 
   HelpCircle, 
   Lock,
-  Sparkles
+  Sparkles,
+  FileCheck2,
+  Bell
 } from 'lucide-react';
 
 export default function StudentDashboard({ onNavigate }) {
   const { user, portalConfig, isAdmin } = useAuth();
-  const { feedbackList } = useData();
+  const { feedbackList, exams } = useData();
   const [disabledModalInfo, setDisabledModalInfo] = useState(null);
 
   const myFeedbacks = feedbackList.slice(0, 3);
+  const upcomingExamsCount = exams ? exams.length : 0;
 
   const statusStyles = {
     'New': 'liquid-glass-pill text-zinc-300',
@@ -90,11 +92,11 @@ export default function StudentDashboard({ onNavigate }) {
       {/* Live 3D Class Tracker Component with Hours & Minutes */}
       <LiveClassCard onViewTimetable={() => onNavigate('timetable')} />
 
-      {/* Core Actions & Disabled Features Grid */}
+      {/* Core Actions & Quick Hubs Grid */}
       <div>
         <h2 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-3.5 px-1 flex items-center gap-2">
           <Sparkles className="w-3.5 h-3.5 text-white" />
-          <span>Student Services & Features</span>
+          <span>Academic Hub & Services</span>
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -110,7 +112,7 @@ export default function StudentDashboard({ onNavigate }) {
               Timetable
             </span>
             <span className="text-xs text-zinc-400 mt-1 block leading-relaxed">
-              Class schedule with hours/mins countdowns
+              Class schedule with hours/mins live countdowns
             </span>
             <span className="mt-4 text-xs font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>Open Timetable</span>
@@ -118,22 +120,29 @@ export default function StudentDashboard({ onNavigate }) {
             </span>
           </button>
 
-          {/* Active 2: Feedback & Grievances */}
+          {/* Active 2: Exams & Syllabus Hub */}
           <button
-            onClick={() => onNavigate('feedback')}
-            className="liquid-glass-interactive flex flex-col items-start p-6 rounded-3xl text-left group"
+            onClick={() => onNavigate('exams')}
+            className="liquid-glass-interactive flex flex-col items-start p-6 rounded-3xl text-left group border border-amber-500/20"
           >
-            <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-4 border border-white/20 group-hover:scale-110 transition-transform shadow-lg">
-              <MessageSquarePlus className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center mb-4 border border-amber-500/30 group-hover:scale-110 transition-transform shadow-lg">
+              <FileCheck2 className="w-6 h-6" />
             </div>
-            <span className="text-base font-bold text-white group-hover:text-zinc-200 transition block">
-              Feedback & Issues
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold text-white group-hover:text-amber-200 transition block">
+                Exams & Syllabus
+              </span>
+              {upcomingExamsCount > 0 && (
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                  <Bell className="w-2.5 h-2.5" /> {upcomingExamsCount} Active
+                </span>
+              )}
+            </div>
             <span className="text-xs text-zinc-400 mt-1 block leading-relaxed">
-              Confidential submissions to Class Rep
+              Official exam notices, syllabus, rooms & drive blueprints
             </span>
-            <span className="mt-4 text-xs font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-              <span>Submit Grievance</span>
+            <span className="mt-4 text-xs font-bold text-amber-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              <span>Check Syllabus & Dates</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </button>
@@ -163,27 +172,25 @@ export default function StudentDashboard({ onNavigate }) {
             </span>
           </button>
 
-          {/* Disabled 2: Doubt Board */}
-          <div
-            onClick={() => setDisabledModalInfo('Academic Doubt Board')}
-            className="liquid-glass-pill flex flex-col items-start p-6 rounded-3xl text-left cursor-pointer relative group opacity-60 hover:opacity-100"
+          {/* Active 4: Feedback & Grievances */}
+          <button
+            onClick={() => onNavigate('feedback')}
+            className="liquid-glass-interactive flex flex-col items-start p-6 rounded-3xl text-left group"
           >
-            <div className="w-12 h-12 rounded-2xl bg-white/5 text-zinc-400 flex items-center justify-center mb-4 border border-white/10">
-              <HelpCircle className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-4 border border-white/20 group-hover:scale-110 transition-transform shadow-lg">
+              <MessageSquarePlus className="w-6 h-6" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base font-bold text-zinc-300 block">Doubt Board</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Locked
-              </span>
-            </div>
-            <span className="text-xs text-zinc-500 mt-1 block leading-relaxed">
-              Peer academic Q&A (Opening soon)
+            <span className="text-base font-bold text-white group-hover:text-zinc-200 transition block">
+              Feedback Desk
             </span>
-            <span className="mt-4 text-[11px] font-bold text-zinc-400 flex items-center gap-1">
-              <span>Click to view status</span>
+            <span className="text-xs text-zinc-400 mt-1 block leading-relaxed">
+              Confidential submissions to Class Rep
             </span>
-          </div>
+            <span className="mt-4 text-xs font-bold text-white flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+              <span>Submit Grievance</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </button>
         </div>
       </div>
 

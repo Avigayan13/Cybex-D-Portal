@@ -31,6 +31,7 @@ let db = {
   announcements: [...initialAnnouncements],
   timetable: [...initialTimetable],
   materials: [...initialMaterials],
+  exams: [],
   feedback: [...initialFeedback],
   doubts: [...initialDoubts],
   students: [...initialStudents],
@@ -56,6 +57,7 @@ function loadDB() {
         ...db,
         ...parsed,
         surveys: parsed.surveys || [],
+        exams: parsed.exams || [],
         students: (parsed.students && parsed.students.length > 0) ? parsed.students : [...initialStudents]
       };
 
@@ -319,6 +321,50 @@ export const Database = {
     db.materials = db.materials.filter(m => m.id !== id);
     saveDB();
     return db.materials.length < before;
+  },
+
+  // Exams & Tests
+  getExams() {
+    return [...(db.exams || [])].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+  },
+  createExam(examData) {
+    if (!db.exams) db.exams = [];
+    const item = {
+      id: `exam-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      examType: 'Mid-Term',
+      venue: 'S 312',
+      syllabus: '',
+      instructions: '',
+      totalMarks: '50',
+      weightage: '25%',
+      isUrgent: false,
+      revisionDocUrl: '',
+      ...examData
+    };
+    db.exams.unshift(item);
+    saveDB();
+    return item;
+  },
+  updateExam(id, updates) {
+    if (!db.exams) return null;
+    const idx = db.exams.findIndex(e => e.id === id);
+    if (idx === -1) return null;
+    db.exams[idx] = { 
+      ...db.exams[idx], 
+      ...updates, 
+      updatedAt: new Date().toISOString() 
+    };
+    saveDB();
+    return db.exams[idx];
+  },
+  deleteExam(id) {
+    if (!db.exams) return false;
+    const before = db.exams.length;
+    db.exams = db.exams.filter(e => e.id !== id);
+    saveDB();
+    return db.exams.length < before;
   },
 
   // Feedback

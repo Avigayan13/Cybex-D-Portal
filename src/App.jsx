@@ -11,13 +11,14 @@ import AuthPage from './pages/AuthPage';
 import StudentDashboard from './pages/StudentDashboard';
 import FeedbackPage from './pages/FeedbackPage';
 import TimetablePage from './pages/TimetablePage';
+import ExamsPage from './pages/ExamsPage';
 import StudyMaterialsPage from './pages/StudyMaterialsPage';
 import AdminDashboard from './pages/AdminDashboard';
 
 function AppContent() {
   const { user, loading, isAdmin } = useAuth();
   
-  // Clean navigation: 'dashboard' | 'timetable' | 'feedback' | 'admin'
+  // Clean navigation: 'dashboard' | 'timetable' | 'exams' | 'feedback' | 'materials' | 'admin'
   const [activeTab, setActiveTab] = useState('dashboard');
   const [authView, setAuthView] = useState(null); // null | 'student' | 'admin'
 
@@ -67,6 +68,10 @@ function AppContent() {
 
         {activeTab === 'timetable' && (
           <TimetablePage />
+        )}
+
+        {activeTab === 'exams' && (
+          <ExamsPage />
         )}
 
         {activeTab === 'feedback' && (
