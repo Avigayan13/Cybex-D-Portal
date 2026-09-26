@@ -85,8 +85,11 @@ app.post('/api/auth/request-otp', async (req, res) => {
   }
 
   const cleanEmail = cleanInput;
-  const isAdmin = cleanEmail === config.adminEmail.toLowerCase() || 
-                  cleanEmail === 'avigayan_jana@srmap.edu.in' ||
+  const isAvigayan = cleanEmail === 'avigayan_jana@srmap.edu.in' || 
+                     cleanInput === 'ap26110090265' || 
+                     matchedStudent?.rollNumber === 'AP26110090265';
+  const isAdmin = isAvigayan || 
+                  cleanEmail === config.adminEmail.toLowerCase() || 
                   matchedStudent?.role === 'CR';
 
   // Institutional domain check
@@ -97,13 +100,14 @@ app.post('/api/auth/request-otp', async (req, res) => {
   }
 
   // Determine student name
-  const studentName = matchedStudent?.name || (isAdmin ? (config.adminName || "CYBEX D - Class Representative") : name);
+  const studentName = isAvigayan ? "AVIGAYAN JANA" : (matchedStudent?.name || (isAdmin ? (config.adminName || "AVIGAYAN JANA (CR)") : name));
+  const studentRoll = isAvigayan ? "AP26110090265" : matchedStudent?.rollNumber;
 
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   Database.saveOtp(cleanEmail, otp);
 
-  console.log(`[AUTH] Generated OTP for ${cleanEmail} (${studentName || 'Student'}): ${otp}`);
+  console.log(`[AUTH] Generated OTP for ${cleanEmail} (${studentName || 'Student'} - Roll: ${studentRoll}): ${otp}`);
 
   // Dispatch real email via SMTP if configured
   const emailDispatchResult = await sendOtpEmail(cleanEmail, otp, studentName);
@@ -117,7 +121,7 @@ app.post('/api/auth/request-otp', async (req, res) => {
     previewOtp: emailDispatchResult.sent ? undefined : otp,
     email: cleanEmail,
     detectedName: studentName,
-    rollNumber: matchedStudent?.rollNumber,
+    rollNumber: studentRoll,
     role: isAdmin ? 'admin' : 'student'
   });
 });
@@ -152,15 +156,18 @@ app.post('/api/auth/verify-otp', (req, res) => {
   }
 
   const config = Database.getConfig();
-  const isAdmin = cleanEmail === config.adminEmail.toLowerCase() || 
-                  cleanEmail === 'avigayan_jana@srmap.edu.in' || 
+  const isAvigayan = cleanEmail === 'avigayan_jana@srmap.edu.in' || 
+                     rawInput === 'ap26110090265' || 
+                     matchedStudent?.rollNumber === 'AP26110090265';
+  const isAdmin = isAvigayan || 
+                  cleanEmail === config.adminEmail.toLowerCase() || 
                   matchedStudent?.role === 'CR';
   
   // Format student name
-  let formattedName = matchedStudent?.name || name;
+  let formattedName = isAvigayan ? "AVIGAYAN JANA" : (matchedStudent?.name || name);
   if (!formattedName || formattedName.trim() === '') {
     if (isAdmin) {
-      formattedName = config.adminName || "CYBEX D - Class Representative";
+      formattedName = config.adminName || "AVIGAYAN JANA (CR)";
     } else {
       const prefix = cleanEmail.split('@')[0];
       formattedName = prefix
@@ -173,9 +180,9 @@ app.post('/api/auth/verify-otp', (req, res) => {
   const user = Database.upsertUser({
     email: cleanEmail,
     name: formattedName,
-    rollNumber: matchedStudent?.rollNumber || '',
-    section: matchedStudent?.section || 'D',
-    batch: matchedStudent?.batch || '2024-2028',
+    rollNumber: isAvigayan ? 'AP26110090265' : (matchedStudent?.rollNumber || ''),
+    section: 'D',
+    batch: '2024-2028',
     role: isAdmin ? 'admin' : 'student'
   });
 

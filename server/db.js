@@ -61,8 +61,19 @@ function loadDB() {
         students: (parsed.students && parsed.students.length > 0) ? parsed.students : [...initialStudents]
       };
 
+      // Ensure admin config is migrated to Avigayan Jana
+      if (!db.config || db.config.adminEmail === 'cr.csed@srmap.edu.in') {
+        db.config = {
+          ...db.config,
+          adminEmail: "avigayan_jana@srmap.edu.in",
+          adminName: "AVIGAYAN JANA (CR)",
+          sectionName: "CYBEX D (CSE Sec-D)",
+          batchYear: "2024 - 2028"
+        };
+      }
+
       // Ensure Avigayan Jana (CR) is synchronized
-      const aviIdx = db.students.findIndex(s => s.email === 'avigayan_jana@srmap.edu.in');
+      const aviIdx = db.students.findIndex(s => s.email === 'avigayan_jana@srmap.edu.in' || s.rollNumber === 'AP26110090265');
       if (aviIdx >= 0) {
         db.students[aviIdx] = {
           ...db.students[aviIdx],
@@ -73,7 +84,39 @@ function loadDB() {
           batch: "2024-2028",
           role: "CR"
         };
+      } else {
+        db.students.push({
+          id: 58,
+          rollNumber: "AP26110090265",
+          name: "AVIGAYAN JANA",
+          email: "avigayan_jana@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "CR"
+        });
       }
+
+      // Ensure Avigayan Jana is registered as CR admin user
+      const aviUser = db.users.find(u => u.email === 'avigayan_jana@srmap.edu.in' || u.rollNumber === 'AP26110090265');
+      if (aviUser) {
+        aviUser.rollNumber = "AP26110090265";
+        aviUser.name = "AVIGAYAN JANA";
+        aviUser.role = "admin";
+        aviUser.email = "avigayan_jana@srmap.edu.in";
+      } else {
+        db.users.push({
+          email: "avigayan_jana@srmap.edu.in",
+          name: "AVIGAYAN JANA",
+          rollNumber: "AP26110090265",
+          section: "D",
+          batch: "2024-2028",
+          role: "admin",
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      // Remove obsolete cr.csed user
+      db.users = db.users.filter(u => u.email !== 'cr.csed@srmap.edu.in');
 
       // Ensure Rajdeep Paudel is synchronized
       const rajdeepIdx = db.students.findIndex(s => s.email === 'rajdeep_paudel@srmap.edu.in' || s.rollNumber === 'AP26110090269');
@@ -114,11 +157,6 @@ function loadDB() {
           role: "student",
           createdAt: new Date().toISOString()
         });
-      }
-
-      const aviUser = db.users.find(u => u.email === 'avigayan_jana@srmap.edu.in');
-      if (aviUser) {
-        aviUser.rollNumber = "AP26110090265";
       }
 
       saveDB();

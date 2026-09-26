@@ -7,10 +7,10 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('srmap_csed_token') || null);
   const [loading, setLoading] = useState(true);
   const [portalConfig, setPortalConfig] = useState({
-    adminEmail: "cr.csed@srmap.edu.in",
-    adminName: "Class Representative",
+    adminEmail: "avigayan_jana@srmap.edu.in",
+    adminName: "AVIGAYAN JANA (CR)",
     sectionName: "CSE Section D",
-    academicYear: "2025-2026 (Semester IV)"
+    academicYear: "2024-2028 (Batch)"
   });
 
   // Safe JSON helper to handle non-JSON responses gracefully

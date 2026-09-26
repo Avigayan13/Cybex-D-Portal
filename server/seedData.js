@@ -1,6 +1,6 @@
 export const initialConfig = {
-  adminEmail: "cr.csed@srmap.edu.in",
-  adminName: "CYBEX D - Class Representative",
+  adminEmail: "avigayan_jana@srmap.edu.in",
+  adminName: "AVIGAYAN JANA (CR)",
   sectionName: "CYBEX D (CSE Sec-D)",
   batchYear: "2024 - 2028",
   academicYear: "Semester I / II",
