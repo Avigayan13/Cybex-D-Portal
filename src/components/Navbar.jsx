@@ -15,7 +15,7 @@ import {
   CheckCircle2,
   GraduationCap,
   Sparkles,
-  User
+  X
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab }) {
@@ -127,7 +127,7 @@ export default function Navbar({ activeTab, setActiveTab }) {
                           : 'liquid-glass-interactive text-zinc-300 hover:text-white'
                         : isActive
                         ? 'liquid-glass-pill bg-white/20 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border-white/30'
-                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.05] rounded-2xl px-3 py-2'
+                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.05] rounded-2xl px-3.5 py-2'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -137,130 +137,142 @@ export default function Navbar({ activeTab, setActiveTab }) {
               })}
             </nav>
 
-            {/* User Profile Dropdown */}
+            {/* User Profile Button */}
             <div className="flex items-center gap-2.5 shrink-0">
               {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left border border-white/15 hover:border-white/30 transition shadow-lg cursor-pointer"
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center text-xs font-black shadow-md">
-                      {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
-                    </div>
-                    
-                    <div className="hidden sm:block text-left">
-                      <p className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
-                        {user.name || user.email.split('@')[0]}
-                      </p>
-                      <p className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
-                        {isAdmin ? (
-                          <span className="text-emerald-400 flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5" /> Class Rep (Admin)
-                          </span>
-                        ) : (
-                          <span className="text-zinc-400">{rollNumber}</span>
-                        )}
-                      </p>
-                    </div>
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="liquid-glass-interactive flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-left border border-white/15 hover:border-white/30 transition shadow-lg cursor-pointer"
+                  title="My Info & Account Details"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center text-xs font-black shadow-md">
+                    {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                  </div>
+                  
+                  <div className="hidden sm:block text-left">
+                    <p className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
+                      {user.name || user.email.split('@')[0]}
+                    </p>
+                    <p className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
+                      {isAdmin ? (
+                        <span className="text-emerald-400 flex items-center gap-0.5">
+                          <Sparkles className="w-2.5 h-2.5" /> Class Rep (Admin)
+                        </span>
+                      ) : (
+                        <span className="text-zinc-400">{rollNumber}</span>
+                      )}
+                    </p>
+                  </div>
 
-                    <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {/* Enhanced Student / CR Profile Card - Positioned Cleanly Below Header Button */}
-                  {showProfileMenu && (
-                    <>
-                      <div 
-                        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs" 
-                        onClick={() => setShowProfileMenu(false)} 
-                      />
-                      <div className="absolute right-0 top-full mt-3 w-80 sm:w-88 max-h-[calc(100vh-100px)] overflow-y-auto liquid-glass bg-black/95 backdrop-blur-3xl rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] border border-white/20 p-4 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
-                        
-                        {/* Profile Header Card */}
-                        <div className="flex items-start gap-3 pb-3.5 border-b border-white/10">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-white to-zinc-300 text-black flex items-center justify-center text-base font-black shadow-xl shrink-0">
-                            {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
-                          </div>
-                          <div className="overflow-hidden flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <h3 className="text-sm font-black text-white truncate">{user.name || 'SRM AP Student'}</h3>
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
-                            </div>
-                            <p className="text-xs text-zinc-400 font-mono tracking-wide truncate">{user.email}</p>
-                            <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/15">
-                              <GraduationCap className="w-3 h-3" />
-                              {isAdmin ? 'Class Representative (CR)' : 'Enrolled Student'}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Verified Academic Credentials Info */}
-                        <div className="py-3 space-y-2 border-b border-white/10 text-xs">
-                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
-                            <span className="text-zinc-400 font-medium">Roll / Reg No:</span>
-                            <span className="font-mono font-bold text-white tracking-wider">{rollNumber}</span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
-                            <span className="text-zinc-400 font-medium">Class & Section:</span>
-                            <span className="font-bold text-white">CSE • Section D</span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
-                            <span className="text-zinc-400 font-medium">Batch / Program:</span>
-                            <span className="font-bold text-zinc-300">B.Tech 2024–2028</span>
-                          </div>
-                          <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
-                            <span className="text-zinc-400 font-medium">Campus:</span>
-                            <span className="font-bold text-zinc-300">SRM University-AP</span>
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="pt-3 space-y-2">
-                          {isAdmin ? (
-                            <button
-                              onClick={() => {
-                                setActiveTab('admin');
-                                setShowProfileMenu(false);
-                              }}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black text-black bg-white hover:bg-zinc-200 rounded-xl transition shadow-lg cursor-pointer"
-                            >
-                              <ShieldCheck className="w-4 h-4 text-black" />
-                              <span>Open CR Control Panel</span>
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setActiveTab('exams');
-                                setShowProfileMenu(false);
-                              }}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white liquid-glass-pill hover:bg-white/15 rounded-xl transition cursor-pointer"
-                            >
-                              <FileCheck2 className="w-4 h-4 text-amber-400" />
-                              <span>View Exams & Syllabus</span>
-                            </button>
-                          )}
-
-                          <button
-                            onClick={() => {
-                              logout();
-                              setShowProfileMenu(false);
-                            }}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-rose-500/20 cursor-pointer"
-                          >
-                            <LogOut className="w-4 h-4" />
-                            <span>Sign Out of Portal</span>
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${showProfileMenu ? 'rotate-180' : ''}`} />
+                </button>
               ) : null}
             </div>
 
           </div>
         </div>
       </header>
+
+      {/* Rock-Solid Full Viewport Profile Modal Popup */}
+      {showProfileMenu && user && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs" 
+            onClick={() => setShowProfileMenu(false)} 
+          />
+
+          {/* Profile Card Fixed Directly Below Header (Never Cut Off) */}
+          <div className="fixed top-18 sm:top-22 right-3 sm:right-6 lg:right-10 w-[calc(100vw-24px)] sm:w-90 max-w-sm liquid-glass bg-black/95 backdrop-blur-3xl rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.98)] border border-white/20 p-4 sm:p-5 z-50 animate-in fade-in zoom-in-95 duration-150 text-zinc-100 max-h-[85vh] overflow-y-auto">
+            
+            {/* Header: Avatar, Name, Email, Close button */}
+            <div className="flex items-start justify-between gap-3 pb-3.5 border-b border-white/10">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-white to-zinc-300 text-black flex items-center justify-center text-base font-black shadow-xl shrink-0">
+                  {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm font-black text-white truncate">{user.name || 'SRM AP Student'}</h3>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
+                  </div>
+                  <p className="text-xs text-zinc-400 font-mono tracking-wide truncate">{user.email}</p>
+                  <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/15">
+                    <GraduationCap className="w-3 h-3" />
+                    {isAdmin ? 'Class Representative (CR)' : 'Enrolled Student'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowProfileMenu(false)}
+                className="p-1.5 rounded-xl liquid-glass-pill text-zinc-400 hover:text-white hover:bg-white/10 transition shrink-0 cursor-pointer"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Verified Academic Details */}
+            <div className="py-3.5 space-y-2 border-b border-white/10 text-xs">
+              <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
+                <span className="text-zinc-400 font-medium">Roll / Reg No:</span>
+                <span className="font-mono font-bold text-white tracking-wider">{rollNumber}</span>
+              </div>
+              <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
+                <span className="text-zinc-400 font-medium">Class & Section:</span>
+                <span className="font-bold text-white">CSE • Section D</span>
+              </div>
+              <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
+                <span className="text-zinc-400 font-medium">Batch / Program:</span>
+                <span className="font-bold text-zinc-300">B.Tech 2024–2028</span>
+              </div>
+              <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.04] border border-white/5">
+                <span className="text-zinc-400 font-medium">Campus:</span>
+                <span className="font-bold text-zinc-300">SRM University-AP</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-3.5 space-y-2">
+              {isAdmin ? (
+                <button
+                  onClick={() => {
+                    setActiveTab('admin');
+                    setShowProfileMenu(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black text-black bg-white hover:bg-zinc-200 rounded-xl transition shadow-lg cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4 text-black" />
+                  <span>Open CR Control Panel</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setActiveTab('exams');
+                    setShowProfileMenu(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-white liquid-glass-pill hover:bg-white/15 rounded-xl transition cursor-pointer"
+                >
+                  <FileCheck2 className="w-4 h-4 text-amber-400" />
+                  <span>View Exams & Syllabus</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  logout();
+                  setShowProfileMenu(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-rose-500/20 cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out of Portal</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Disabled Modal Explaining Temporarily Locked Features */}
       <DisabledNoticeModal
