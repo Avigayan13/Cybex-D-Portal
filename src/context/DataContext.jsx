@@ -9,6 +9,8 @@ export function DataProvider({ children }) {
   const [announcements, setAnnouncements] = useState([]);
   const [timetable, setTimetable] = useState([]);
   const [materials, setMaterials] = useState([]);
+  const [classroomFeed, setClassroomFeed] = useState([]);
+  const [classroomStatus, setClassroomStatus] = useState({ isConfigured: false, isConnected: false, totalItems: 0 });
   const [feedbackList, setFeedbackList] = useState([]);
   const [doubtsList, setDoubtsList] = useState([]);
   const [studentsList, setStudentsList] = useState([]);
@@ -49,13 +51,15 @@ export function DataProvider({ children }) {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [annRes, ttRes, matRes, dbtRes, stuRes, srvRes] = await Promise.all([
+      const [annRes, ttRes, matRes, dbtRes, stuRes, srvRes, gcRes, gcStatusRes] = await Promise.all([
         fetch('/api/announcements'),
         fetch('/api/timetable'),
         fetch('/api/materials'),
         fetch('/api/doubts'),
         fetch('/api/students'),
-        fetch('/api/surveys/stats')
+        fetch('/api/surveys/stats'),
+        fetch('/api/classroom/feed'),
+        fetch('/api/classroom/status')
       ]);
 
       if (annRes.ok) { const d = await parseSafe(annRes); if (d) setAnnouncements(d); }
@@ -64,6 +68,8 @@ export function DataProvider({ children }) {
       if (dbtRes.ok) { const d = await parseSafe(dbtRes); if (d) setDoubtsList(d); }
       if (stuRes.ok) { const d = await parseSafe(stuRes); if (d) setStudentsList(d); }
       if (srvRes.ok) { const d = await parseSafe(srvRes); if (d) setSurveyStats(d); }
+      if (gcRes.ok) { const d = await parseSafe(gcRes); if (d) setClassroomFeed(d); }
+      if (gcStatusRes.ok) { const d = await parseSafe(gcStatusRes); if (d) setClassroomStatus(d); }
 
       if (token) {
         const [fbRes, srvStatusRes] = await Promise.all([
@@ -321,11 +327,54 @@ export function DataProvider({ children }) {
     return data;
   };
 
+  // Google Classroom Actions
+  const syncClassroomFeed = async () => {
+    const res = await fetch('/api/classroom/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to sync Google Classroom');
+    if (data.items) setClassroomFeed(data.items);
+    fetchData();
+    return data;
+  };
+
+  const connectGoogleClassroom = async () => {
+    if (!token) throw new Error('Admin authentication required');
+    const res = await fetch('/api/classroom/auth-url', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to get Google Classroom authorization URL');
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  };
+
+  const disconnectGoogleClassroom = async () => {
+    if (!token) throw new Error('Admin authentication required');
+    const res = await fetch('/api/classroom/disconnect', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to disconnect Google Classroom');
+    setClassroomStatus(prev => ({ ...prev, isConnected: false }));
+    fetchData();
+    return data;
+  };
+
   return (
     <DataContext.Provider value={{
       announcements,
       timetable,
       materials,
+      classroomFeed,
+      classroomStatus,
       feedbackList,
       doubtsList,
       studentsList,
@@ -336,6 +385,9 @@ export function DataProvider({ children }) {
       currentTime,
       liveStatus,
       refreshData: fetchData,
+      syncClassroomFeed,
+      connectGoogleClassroom,
+      disconnectGoogleClassroom,
       submitFeedback,
       updateFeedbackStatus,
       deleteFeedback,

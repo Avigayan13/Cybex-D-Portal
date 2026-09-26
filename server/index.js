@@ -7,6 +7,7 @@ import multer from 'multer';
 import { Database } from './db.js';
 import { generateToken, authenticate, requireAuth, requireAdmin } from './auth.js';
 import { sendOtpEmail } from './emailService.js';
+import { ClassroomService } from './classroomService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -593,6 +594,79 @@ app.delete('/api/students/:id', requireAdmin, (req, res) => {
   const ok = Database.deleteStudent(req.params.id);
   if (!ok) return res.status(404).json({ error: "Student not found" });
   res.json({ success: true, message: "Student removed from directory." });
+});
+
+// ==========================================
+// GOOGLE CLASSROOM LIVE SYNC ROUTES
+// ==========================================
+
+// Get Classroom Live Feed (materials, announcements, assignments, PDFs)
+app.get('/api/classroom/feed', (req, res) => {
+  const feed = ClassroomService.getFeed();
+  res.json(feed);
+});
+
+// Check Classroom Connection Status
+app.get('/api/classroom/status', (req, res) => {
+  res.json({
+    isConfigured: ClassroomService.isConfigured(),
+    isConnected: ClassroomService.isConnected(),
+    totalItems: ClassroomService.getFeed().length
+  });
+});
+
+// Generate Google OAuth URL (for CR/Admin)
+app.get('/api/classroom/auth-url', requireAdmin, (req, res) => {
+  try {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.headers['x-forwarded-host'] || req.get('host');
+    const redirectUri = `${protocol}://${host}/api/classroom/oauth-callback`;
+    const url = ClassroomService.getAuthUrl(redirectUri);
+    res.json({ url });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// OAuth Callback Handler from Google
+app.get('/api/classroom/oauth-callback', async (req, res) => {
+  const { code, error } = req.query;
+  if (error) {
+    return res.redirect('/?classroom_auth=error&msg=' + encodeURIComponent(error));
+  }
+  if (!code) {
+    return res.redirect('/?classroom_auth=failed');
+  }
+
+  try {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.headers['x-forwarded-host'] || req.get('host');
+    const redirectUri = `${protocol}://${host}/api/classroom/oauth-callback`;
+    await ClassroomService.handleCallback(code, redirectUri);
+    res.redirect('/?classroom_auth=success');
+  } catch (err) {
+    console.error('OAuth Callback error:', err);
+    res.redirect('/?classroom_auth=error&msg=' + encodeURIComponent(err.message));
+  }
+});
+
+// Trigger Instant Sync (for CR/Admin or student refresh)
+app.post('/api/classroom/sync', async (req, res) => {
+  try {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.headers['x-forwarded-host'] || req.get('host');
+    const redirectUri = `${protocol}://${host}/api/classroom/oauth-callback`;
+    const items = await ClassroomService.syncClassroomFeed(redirectUri);
+    res.json({ success: true, count: items.length, items });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Sync failed' });
+  }
+});
+
+// Disconnect Classroom
+app.post('/api/classroom/disconnect', requireAdmin, (req, res) => {
+  Database.clearClassroomTokens();
+  res.json({ success: true, message: 'Google Classroom disconnected.' });
 });
 
 // ==========================================

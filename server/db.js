@@ -463,5 +463,56 @@ export const Database = {
       totalStudents,
       surveyStats
     };
+  },
+
+  // ==========================================
+  // GOOGLE CLASSROOM SYNC STORAGE
+  // ==========================================
+  getClassroomFeed() {
+    return db.classroomFeed || [];
+  },
+
+  saveClassroomFeed(items) {
+    db.classroomFeed = items;
+    saveDB();
+    return db.classroomFeed;
+  },
+
+  addClassroomFeedItem(item) {
+    if (!db.classroomFeed) db.classroomFeed = [];
+    const exists = db.classroomFeed.find(f => f.id === item.id);
+    if (exists) {
+      Object.assign(exists, item);
+    } else {
+      db.classroomFeed.unshift(item);
+    }
+    saveDB();
+    return db.classroomFeed;
+  },
+
+  deleteClassroomFeedItem(id) {
+    if (!db.classroomFeed) return false;
+    db.classroomFeed = db.classroomFeed.filter(f => f.id !== id);
+    saveDB();
+    return true;
+  },
+
+  getClassroomTokens() {
+    return db.classroomTokens || null;
+  },
+
+  saveClassroomTokens(tokens) {
+    db.classroomTokens = {
+      ...tokens,
+      updatedAt: new Date().toISOString()
+    };
+    saveDB();
+    return db.classroomTokens;
+  },
+
+  clearClassroomTokens() {
+    db.classroomTokens = null;
+    saveDB();
+    return true;
   }
 };

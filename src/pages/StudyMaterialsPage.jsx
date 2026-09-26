@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
+import GoogleClassroomVault from '../components/GoogleClassroomVault';
 import { 
   BookOpen, 
   Search, 
@@ -15,7 +16,9 @@ import {
   Filter, 
   UploadCloud,
   FileCode,
-  Tag
+  Tag,
+  FolderGit2,
+  Archive
 } from 'lucide-react';
 
 export default function StudyMaterialsPage() {
@@ -23,6 +26,7 @@ export default function StudyMaterialsPage() {
   const { materials, addMaterial, deleteMaterial } = useData();
   const { addToast } = useToast();
 
+  const [activeVaultTab, setActiveVaultTab] = useState('classroom'); // 'classroom' | 'cr_materials'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
@@ -118,32 +122,62 @@ export default function StudyMaterialsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-srm-600 bg-srm-50 px-2.5 py-0.5 rounded-full border border-srm-100">
-              Academic Repository
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
-            Study Materials Hub
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
-            Access subject-wise lecture notes, previous year question papers, lab handouts, and formula sheets curated for CSE Section D.
-          </p>
-        </div>
-
-        {isAdmin && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-600/25 transition flex items-center justify-center gap-2 shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ Upload / Add Material</span>
-          </button>
-        )}
+      {/* Top Vault Mode Switcher */}
+      <div className="flex items-center gap-2 p-1.5 liquid-glass rounded-2xl border border-white/10 max-w-md shadow-lg">
+        <button
+          onClick={() => setActiveVaultTab('classroom')}
+          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+            activeVaultTab === 'classroom'
+              ? 'bg-white text-black shadow-lg font-black'
+              : 'text-zinc-400 hover:text-white'
+          }`}
+        >
+          <FolderGit2 className={`w-4 h-4 ${activeVaultTab === 'classroom' ? 'text-indigo-600' : 'text-indigo-400'}`} />
+          <span>Google Classroom Vault</span>
+        </button>
+        <button
+          onClick={() => setActiveVaultTab('cr_materials')}
+          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+            activeVaultTab === 'cr_materials'
+              ? 'bg-white text-black shadow-lg font-black'
+              : 'text-zinc-400 hover:text-white'
+          }`}
+        >
+          <Archive className={`w-4 h-4 ${activeVaultTab === 'cr_materials' ? 'text-amber-600' : 'text-amber-400'}`} />
+          <span>CR Upload Archive</span>
+        </button>
       </div>
+
+      {activeVaultTab === 'classroom' ? (
+        <GoogleClassroomVault />
+      ) : (
+        <>
+          {/* Header Banner */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 liquid-glass rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-300 liquid-glass-pill px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                  CR Archive & PYQs
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                Study Materials Hub
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl">
+                Access subject-wise lecture notes, previous year question papers, lab handouts, and formula sheets curated for CSE Section D.
+              </p>
+            </div>
+
+            {isAdmin && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-5 py-3 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-sm shadow-[0_0_20px_rgba(255,255,255,0.3)] transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Upload Material</span>
+              </button>
+            )}
+          </div>
 
       {/* Filter & Search Bar */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
@@ -279,6 +313,8 @@ export default function StudyMaterialsPage() {
             </div>
           ))}
         </div>
+      )}
+      </>
       )}
 
       {/* Upload / Add Material Modal (CR Admin) */}
