@@ -9,7 +9,6 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Express.js](https://img.shields.io/badge/Express.js-Backend-000000.svg?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 
-**The ultra-fast, liquid glass digital hub for Computer Science & Engineering (Cyber Security), Section D at SRM University AP.**
 
 </div>
 
