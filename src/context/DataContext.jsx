@@ -9,8 +9,18 @@ export function DataProvider({ children }) {
   const [announcements, setAnnouncements] = useState([]);
   const [timetable, setTimetable] = useState([]);
   const [materials, setMaterials] = useState([]);
-  const [classroomFeed, setClassroomFeed] = useState([]);
-  const [classroomStatus, setClassroomStatus] = useState({ isConfigured: false, isConnected: false, totalItems: 0 });
+  const [classroomFeed, setClassroomFeed] = useState(() => {
+    try {
+      const cached = localStorage.getItem('srmap_gc_feed');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [classroomStatus, setClassroomStatus] = useState(() => {
+    const hasTokens = Boolean(localStorage.getItem('srmap_gc_tokens') || localStorage.getItem('srmap_gc_refresh_token'));
+    return { isConfigured: true, isConnected: hasTokens, totalItems: 0 };
+  });
   const [feedbackList, setFeedbackList] = useState([]);
   const [doubtsList, setDoubtsList] = useState([]);
   const [studentsList, setStudentsList] = useState([]);
@@ -51,6 +61,9 @@ export function DataProvider({ children }) {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
+      const localTokens = localStorage.getItem('srmap_gc_tokens');
+      const gcHeaders = localTokens ? { 'x-classroom-tokens': localTokens } : {};
+
       const [annRes, ttRes, matRes, dbtRes, stuRes, srvRes, gcRes, gcStatusRes] = await Promise.all([
         fetch('/api/announcements'),
         fetch('/api/timetable'),
@@ -58,8 +71,8 @@ export function DataProvider({ children }) {
         fetch('/api/doubts'),
         fetch('/api/students'),
         fetch('/api/surveys/stats'),
-        fetch('/api/classroom/feed'),
-        fetch('/api/classroom/status')
+        fetch('/api/classroom/feed', { headers: gcHeaders }),
+        fetch('/api/classroom/status', { headers: gcHeaders })
       ]);
 
       if (annRes.ok) { const d = await parseSafe(annRes); if (d) setAnnouncements(d); }
@@ -68,8 +81,25 @@ export function DataProvider({ children }) {
       if (dbtRes.ok) { const d = await parseSafe(dbtRes); if (d) setDoubtsList(d); }
       if (stuRes.ok) { const d = await parseSafe(stuRes); if (d) setStudentsList(d); }
       if (srvRes.ok) { const d = await parseSafe(srvRes); if (d) setSurveyStats(d); }
-      if (gcRes.ok) { const d = await parseSafe(gcRes); if (d) setClassroomFeed(d); }
-      if (gcStatusRes.ok) { const d = await parseSafe(gcStatusRes); if (d) setClassroomStatus(d); }
+      
+      if (gcRes.ok) { 
+        const d = await parseSafe(gcRes); 
+        if (d && Array.isArray(d) && d.length > 0) {
+          setClassroomFeed(d);
+          try { localStorage.setItem('srmap_gc_feed', JSON.stringify(d)); } catch {}
+        }
+      }
+      
+      if (gcStatusRes.ok) { 
+        const d = await parseSafe(gcStatusRes); 
+        if (d) {
+          const hasLocalToken = Boolean(localStorage.getItem('srmap_gc_tokens') || localStorage.getItem('srmap_gc_refresh_token'));
+          setClassroomStatus({
+            ...d,
+            isConnected: d.isConnected || hasLocalToken
+          });
+        }
+      }
 
       if (token) {
         const [fbRes, srvStatusRes] = await Promise.all([
@@ -103,6 +133,34 @@ export function DataProvider({ children }) {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Handle OAuth callback tokens from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const gcTokensParam = params.get('gc_tokens');
+    const authStatus = params.get('classroom_auth');
+
+    if (gcTokensParam) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(gcTokensParam));
+        localStorage.setItem('srmap_gc_tokens', JSON.stringify(decoded));
+        if (decoded.refresh_token) {
+          localStorage.setItem('srmap_gc_refresh_token', decoded.refresh_token);
+        }
+        setClassroomStatus(prev => ({ ...prev, isConnected: true }));
+      } catch (e) {
+        console.warn('Failed to parse gc_tokens:', e);
+      }
+      // Clean query params from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (authStatus === 'success' || gcTokensParam) {
+      setTimeout(() => {
+        syncClassroomFeed().catch(e => console.warn('Post-auth auto sync:', e));
+      }, 500);
+    }
+  }, []);
 
   // Compute Live Class Status based on current time & timetable (Shows Hours & Minutes)
   useEffect(() => {
@@ -328,18 +386,39 @@ export function DataProvider({ children }) {
   };
 
   // Google Classroom Actions
-  const syncClassroomFeed = async () => {
+  const syncClassroomFeed = async (overrideTokens = null) => {
+    let tokensToSend = overrideTokens;
+    if (!tokensToSend) {
+      try {
+        const raw = localStorage.getItem('srmap_gc_tokens');
+        if (raw) tokensToSend = JSON.parse(raw);
+      } catch {}
+    }
+
     const res = await fetch('/api/classroom/sync', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      }
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(tokensToSend ? { 'x-classroom-tokens': JSON.stringify(tokensToSend) } : {})
+      },
+      body: JSON.stringify({ tokens: tokensToSend })
     });
+    
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to sync Google Classroom');
-    if (data.items) setClassroomFeed(data.items);
-    fetchData();
+    
+    if (data.items && Array.isArray(data.items)) {
+      setClassroomFeed(data.items);
+      try { localStorage.setItem('srmap_gc_feed', JSON.stringify(data.items)); } catch {}
+    }
+
+    setClassroomStatus(prev => ({
+      ...prev,
+      isConnected: true,
+      totalItems: data.items ? data.items.length : prev.totalItems
+    }));
+
     return data;
   };
 
@@ -356,16 +435,22 @@ export function DataProvider({ children }) {
   };
 
   const disconnectGoogleClassroom = async () => {
-    if (!token) throw new Error('Admin authentication required');
-    const res = await fetch('/api/classroom/disconnect', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to disconnect Google Classroom');
+    localStorage.removeItem('srmap_gc_tokens');
+    localStorage.removeItem('srmap_gc_refresh_token');
+    
+    if (token) {
+      try {
+        await fetch('/api/classroom/disconnect', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.warn('Disconnect error:', e);
+      }
+    }
+    
     setClassroomStatus(prev => ({ ...prev, isConnected: false }));
     fetchData();
-    return data;
   };
 
   return (

@@ -126,7 +126,13 @@ export const ClassroomService = {
     return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
   },
 
-  isConnected() {
+  isConnected(customTokens = null) {
+    if (customTokens && (customTokens.access_token || customTokens.refresh_token)) {
+      return true;
+    }
+    if (process.env.GOOGLE_CLASSROOM_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN) {
+      return true;
+    }
     const tokens = Database.getClassroomTokens();
     return Boolean(tokens && (tokens.access_token || tokens.refresh_token));
   },
@@ -153,9 +159,9 @@ export const ClassroomService = {
     const { tokens } = await oauth2Client.getToken(code);
     Database.saveClassroomTokens(tokens);
 
-    // Trigger initial sync
+    // Trigger initial sync with these fresh tokens
     try {
-      await this.syncClassroomFeed(redirectUri);
+      await this.syncClassroomFeed(redirectUri, tokens);
     } catch (err) {
       console.error('Initial sync error after auth:', err.message);
     }
@@ -163,8 +169,20 @@ export const ClassroomService = {
     return tokens;
   },
 
-  async getAuthenticatedClient(redirectUri) {
-    const tokens = Database.getClassroomTokens();
+  async getAuthenticatedClient(redirectUri, customTokens = null) {
+    let tokens = customTokens;
+    
+    if (!tokens || (!tokens.access_token && !tokens.refresh_token)) {
+      tokens = Database.getClassroomTokens();
+    }
+    
+    if (!tokens || (!tokens.access_token && !tokens.refresh_token)) {
+      const envRefresh = process.env.GOOGLE_CLASSROOM_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN;
+      if (envRefresh) {
+        tokens = { refresh_token: envRefresh };
+      }
+    }
+
     if (!tokens) return null;
 
     const oauth2Client = getOAuth2Client(redirectUri);
@@ -183,8 +201,8 @@ export const ClassroomService = {
     return oauth2Client;
   },
 
-  async syncClassroomFeed(redirectUri) {
-    const auth = await this.getAuthenticatedClient(redirectUri);
+  async syncClassroomFeed(redirectUri, customTokens = null) {
+    const auth = await this.getAuthenticatedClient(redirectUri, customTokens);
     if (!auth) {
       // If not authenticated, return existing feed
       const existing = Database.getClassroomFeed();
@@ -197,48 +215,71 @@ export const ClassroomService = {
     const classroom = google.classroom({ version: 'v1', auth });
     
     // 1. Fetch active courses where user is enrolled as Student or Teacher
-    let courses = [];
+    const coursesMap = new Map();
+
+    // Query A: Student enrolled courses
     try {
-      const studentCoursesRes = await classroom.courses.list({
+      const studentRes = await classroom.courses.list({
         studentId: 'me',
-        courseStates: ['ACTIVE'],
-        pageSize: 30
+        pageSize: 50
       });
-      if (studentCoursesRes.data.courses) {
-        courses.push(...studentCoursesRes.data.courses);
+      if (studentRes.data.courses) {
+        for (const c of studentRes.data.courses) {
+          if (c.id) coursesMap.set(c.id, c);
+        }
       }
     } catch (e) {
-      console.warn('[CLASSROOM] student courses query note:', e.message);
+      console.warn('[CLASSROOM] student courses query:', e.message);
     }
 
+    // Query B: All accessible courses
     try {
-      const allCoursesRes = await classroom.courses.list({
-        courseStates: ['ACTIVE'],
-        pageSize: 30
+      const allRes = await classroom.courses.list({
+        pageSize: 50
       });
-      if (allCoursesRes.data.courses) {
-        for (const c of allCoursesRes.data.courses) {
-          if (!courses.some(existing => existing.id === c.id)) {
-            courses.push(c);
+      if (allRes.data.courses) {
+        for (const c of allRes.data.courses) {
+          if (c.id && !coursesMap.has(c.id)) {
+            coursesMap.set(c.id, c);
           }
         }
       }
     } catch (e) {
-      console.warn('[CLASSROOM] all courses query note:', e.message);
+      console.warn('[CLASSROOM] all courses query:', e.message);
     }
+
+    // Query C: Teacher courses if any
+    try {
+      const teacherRes = await classroom.courses.list({
+        teacherId: 'me',
+        pageSize: 50
+      });
+      if (teacherRes.data.courses) {
+        for (const c of teacherRes.data.courses) {
+          if (c.id && !coursesMap.has(c.id)) {
+            coursesMap.set(c.id, c);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[CLASSROOM] teacher courses query:', e.message);
+    }
+
+    const courses = Array.from(coursesMap.values());
+    console.log(`[CLASSROOM] Found ${courses.length} courses for Section D.`);
 
     const allItems = [];
 
     for (const course of courses) {
       const courseId = course.id;
-      const courseName = course.name || 'Unnamed Course';
+      const courseName = course.name || 'Section D Course';
       const section = course.section || 'CSE-D';
 
+      // A. Fetch Announcements
       try {
-        // A. Fetch Announcements
         const annRes = await classroom.courses.announcements.list({
           courseId,
-          pageSize: 15
+          pageSize: 20
         });
 
         const announcements = annRes.data.announcements || [];
@@ -246,16 +287,17 @@ export const ClassroomService = {
           const attachments = [];
           if (a.materials) {
             for (const m of a.materials) {
-              if (m.driveFile && m.driveFile.driveFile) {
-                const df = m.driveFile.driveFile;
+              const df = m.driveFile?.driveFile || m.driveFile;
+              if (df) {
                 const isPdf = (df.title || '').toLowerCase().endsWith('.pdf');
+                const fileUrl = df.alternateLink || (df.id ? `https://drive.google.com/file/d/${df.id}/view` : 'https://drive.google.com');
                 attachments.push({
                   title: df.title || 'Attached Document',
                   fileType: isPdf ? 'pdf' : 'doc',
-                  url: df.alternateLink || `https://drive.google.com/file/d/${df.id}/view`,
-                  alternateLink: df.alternateLink,
-                  thumbnailUrl: df.thumbnailUrl,
-                  driveFileId: df.id,
+                  url: fileUrl,
+                  alternateLink: fileUrl,
+                  thumbnailUrl: df.thumbnailUrl || null,
+                  driveFileId: df.id || null,
                   hasDirectPreview: true
                 });
               } else if (m.link) {
@@ -272,6 +314,13 @@ export const ClassroomService = {
                   url: m.youtubeVideo.alternateLink,
                   alternateLink: m.youtubeVideo.alternateLink
                 });
+              } else if (m.form) {
+                attachments.push({
+                  title: m.form.title || 'Google Form / Quiz',
+                  fileType: 'link',
+                  url: m.form.formUrl,
+                  alternateLink: m.form.formUrl
+                });
               }
             }
           }
@@ -282,7 +331,7 @@ export const ClassroomService = {
             courseName,
             section,
             faculty: a.creatorUserId || course.ownerId || 'Course Instructor',
-            title: a.text ? (a.text.slice(0, 70) + (a.text.length > 70 ? '...' : '')) : 'Classroom Notice',
+            title: a.text ? (a.text.slice(0, 80) + (a.text.length > 80 ? '...' : '')) : 'Classroom Notice',
             text: a.text || '',
             type: 'announcement',
             creationTime: a.creationTime || new Date().toISOString(),
@@ -290,11 +339,15 @@ export const ClassroomService = {
             attachments
           });
         }
+      } catch (annErr) {
+        console.warn(`[CLASSROOM] Announcements note for ${courseName}:`, annErr.message);
+      }
 
-        // B. Fetch Coursework Materials (Lecture Notes, PDFs, Syllabus)
+      // B. Fetch Coursework Materials (Lecture Notes, PDFs, Syllabus)
+      try {
         const matRes = await classroom.courses.courseWorkMaterials.list({
           courseId,
-          pageSize: 15
+          pageSize: 20
         });
 
         const materials = matRes.data.courseWorkMaterial || [];
@@ -302,16 +355,17 @@ export const ClassroomService = {
           const attachments = [];
           if (m.materials) {
             for (const item of m.materials) {
-              if (item.driveFile && item.driveFile.driveFile) {
-                const df = item.driveFile.driveFile;
+              const df = item.driveFile?.driveFile || item.driveFile;
+              if (df) {
                 const isPdf = (df.title || '').toLowerCase().endsWith('.pdf');
+                const fileUrl = df.alternateLink || (df.id ? `https://drive.google.com/file/d/${df.id}/view` : 'https://drive.google.com');
                 attachments.push({
                   title: df.title || 'Course Material',
                   fileType: isPdf ? 'pdf' : 'doc',
-                  url: df.alternateLink || `https://drive.google.com/file/d/${df.id}/view`,
-                  alternateLink: df.alternateLink,
-                  thumbnailUrl: df.thumbnailUrl,
-                  driveFileId: df.id,
+                  url: fileUrl,
+                  alternateLink: fileUrl,
+                  thumbnailUrl: df.thumbnailUrl || null,
+                  driveFileId: df.id || null,
                   hasDirectPreview: true
                 });
               } else if (item.link) {
@@ -320,6 +374,20 @@ export const ClassroomService = {
                   fileType: 'link',
                   url: item.link.url,
                   alternateLink: item.link.url
+                });
+              } else if (item.youtubeVideo) {
+                attachments.push({
+                  title: item.youtubeVideo.title || 'YouTube Video',
+                  fileType: 'video',
+                  url: item.youtubeVideo.alternateLink,
+                  alternateLink: item.youtubeVideo.alternateLink
+                });
+              } else if (item.form) {
+                attachments.push({
+                  title: item.form.title || 'Google Form / Quiz',
+                  fileType: 'link',
+                  url: item.form.formUrl,
+                  alternateLink: item.form.formUrl
                 });
               }
             }
@@ -339,11 +407,15 @@ export const ClassroomService = {
             attachments
           });
         }
+      } catch (matErr) {
+        console.warn(`[CLASSROOM] Materials note for ${courseName}:`, matErr.message);
+      }
 
-        // C. Fetch Coursework (Assignments & Homework PDFs)
+      // C. Fetch Coursework (Assignments & Homework PDFs)
+      try {
         const workRes = await classroom.courses.courseWork.list({
           courseId,
-          pageSize: 10
+          pageSize: 20
         });
 
         const coursework = workRes.data.courseWork || [];
@@ -351,17 +423,39 @@ export const ClassroomService = {
           const attachments = [];
           if (cw.materials) {
             for (const item of cw.materials) {
-              if (item.driveFile && item.driveFile.driveFile) {
-                const df = item.driveFile.driveFile;
+              const df = item.driveFile?.driveFile || item.driveFile;
+              if (df) {
                 const isPdf = (df.title || '').toLowerCase().endsWith('.pdf');
+                const fileUrl = df.alternateLink || (df.id ? `https://drive.google.com/file/d/${df.id}/view` : 'https://drive.google.com');
                 attachments.push({
                   title: df.title || 'Assignment Document',
                   fileType: isPdf ? 'pdf' : 'doc',
-                  url: df.alternateLink || `https://drive.google.com/file/d/${df.id}/view`,
-                  alternateLink: df.alternateLink,
-                  thumbnailUrl: df.thumbnailUrl,
-                  driveFileId: df.id,
+                  url: fileUrl,
+                  alternateLink: fileUrl,
+                  thumbnailUrl: df.thumbnailUrl || null,
+                  driveFileId: df.id || null,
                   hasDirectPreview: true
+                });
+              } else if (item.link) {
+                attachments.push({
+                  title: item.link.title || item.link.url,
+                  fileType: 'link',
+                  url: item.link.url,
+                  alternateLink: item.link.url
+                });
+              } else if (item.youtubeVideo) {
+                attachments.push({
+                  title: item.youtubeVideo.title || 'YouTube Video',
+                  fileType: 'video',
+                  url: item.youtubeVideo.alternateLink,
+                  alternateLink: item.youtubeVideo.alternateLink
+                });
+              } else if (item.form) {
+                attachments.push({
+                  title: item.form.title || 'Google Form / Quiz',
+                  fileType: 'link',
+                  url: item.form.formUrl,
+                  alternateLink: item.form.formUrl
                 });
               }
             }
@@ -382,8 +476,8 @@ export const ClassroomService = {
             attachments
           });
         }
-      } catch (courseErr) {
-        console.warn(`[CLASSROOM] Error fetching items for course ${courseName}:`, courseErr.message);
+      } catch (cwErr) {
+        console.warn(`[CLASSROOM] Coursework note for ${courseName}:`, cwErr.message);
       }
     }
 

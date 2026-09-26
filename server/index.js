@@ -608,9 +608,16 @@ app.get('/api/classroom/feed', (req, res) => {
 
 // Check Classroom Connection Status
 app.get('/api/classroom/status', (req, res) => {
+  const tokenHeader = req.headers['x-classroom-tokens'];
+  let customTokens = null;
+  if (tokenHeader) {
+    try { customTokens = JSON.parse(tokenHeader); } catch {}
+  }
+
   res.json({
     isConfigured: ClassroomService.isConfigured(),
-    isConnected: ClassroomService.isConnected(),
+    isConnected: ClassroomService.isConnected(customTokens),
+    hasEnvRefreshToken: Boolean(process.env.GOOGLE_CLASSROOM_REFRESH_TOKEN || process.env.GOOGLE_REFRESH_TOKEN),
     totalItems: ClassroomService.getFeed().length
   });
 });
@@ -642,8 +649,16 @@ app.get('/api/classroom/oauth-callback', async (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.headers['x-forwarded-host'] || req.get('host');
     const redirectUri = `${protocol}://${host}/api/classroom/oauth-callback`;
-    await ClassroomService.handleCallback(code, redirectUri);
-    res.redirect('/?classroom_auth=success');
+    const tokens = await ClassroomService.handleCallback(code, redirectUri);
+    
+    // Safely encode tokens in URL param so frontend captures and persists in localStorage
+    const safeTokens = {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expiry_date: tokens.expiry_date
+    };
+    const tokenStr = encodeURIComponent(JSON.stringify(safeTokens));
+    res.redirect(`/?classroom_auth=success&gc_tokens=${tokenStr}`);
   } catch (err) {
     console.error('OAuth Callback error:', err);
     res.redirect('/?classroom_auth=error&msg=' + encodeURIComponent(err.message));
@@ -656,9 +671,16 @@ app.post('/api/classroom/sync', async (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.headers['x-forwarded-host'] || req.get('host');
     const redirectUri = `${protocol}://${host}/api/classroom/oauth-callback`;
-    const items = await ClassroomService.syncClassroomFeed(redirectUri);
+    
+    let customTokens = req.body?.tokens || null;
+    if (!customTokens && req.headers['x-classroom-tokens']) {
+      try { customTokens = JSON.parse(req.headers['x-classroom-tokens']); } catch {}
+    }
+
+    const items = await ClassroomService.syncClassroomFeed(redirectUri, customTokens);
     res.json({ success: true, count: items.length, items });
   } catch (err) {
+    console.error('[SYNC ERROR]', err);
     res.status(500).json({ error: err.message || 'Sync failed' });
   }
 });

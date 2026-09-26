@@ -24,7 +24,9 @@ import {
   FileCode,
   ShieldCheck,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  Copy,
+  Check
 } from 'lucide-react';
 
 export default function GoogleClassroomVault() {
@@ -37,6 +39,9 @@ export default function GoogleClassroomVault() {
   const [selectedType, setSelectedType] = useState('All'); // 'All' | 'material' | 'announcement' | 'assignment'
   const [syncing, setSyncing] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
+
+  const localRefreshToken = localStorage.getItem('srmap_gc_refresh_token');
 
   // Extract unique courses from feed
   const availableCourses = ['All', ...new Set((classroomFeed || []).map(f => f.courseName || f.courseCode).filter(Boolean))];
@@ -94,6 +99,14 @@ export default function GoogleClassroomVault() {
         addToast(err.message, 'error');
       }
     }
+  };
+
+  const handleCopyRefreshToken = () => {
+    if (!localRefreshToken) return;
+    navigator.clipboard.writeText(localRefreshToken);
+    setCopiedToken(true);
+    addToast('Refresh token copied to clipboard!', 'success');
+    setTimeout(() => setCopiedToken(false), 3000);
   };
 
   // Helper to format timestamps
@@ -396,7 +409,7 @@ export default function GoogleClassroomVault() {
       >
         <div className="space-y-4 text-xs sm:text-sm text-zinc-300">
           <p className="leading-relaxed">
-            The <strong>CYBEX D Google Classroom Vault</strong> automatically queries Google Classroom API to mirror PDF lecture notes, lab sheets, and notices for Section D.
+            The <strong>CYBEX D Google Classroom Vault</strong> automatically mirrors PDF lecture notes, lab sheets, and notices from Section D courses directly to all 58 students.
           </p>
 
           <div className="p-4 rounded-2xl liquid-glass border border-indigo-500/30 space-y-2">
@@ -405,15 +418,40 @@ export default function GoogleClassroomVault() {
               <span>How to authorize your @srmap.edu.in account:</span>
             </h4>
             <ol className="list-decimal pl-5 space-y-1.5 text-zinc-300 text-xs">
-              <li>Make sure <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> are added in Vercel Environment Variables.</li>
+              <li>Make sure <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> are set in Vercel Environment Variables.</li>
               <li>Click <strong>Connect Google Account</strong> as Class Representative.</li>
               <li>Sign in with your institutional SRM AP Google account.</li>
               <li>Grant Read-Only permissions for Classroom courses and Drive attachments.</li>
             </ol>
           </div>
 
+          {/* CR Refresh Token Box for Permanent 24/7 Serverless Sync */}
+          {localRefreshToken && (
+            <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/40 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-indigo-300 flex items-center gap-1.5 text-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>24/7 Cloud Background Sync Token</span>
+                </span>
+                <button
+                  onClick={handleCopyRefreshToken}
+                  className="px-2.5 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
+                >
+                  {copiedToken ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedToken ? 'Copied!' : 'Copy Token'}</span>
+                </button>
+              </div>
+              <p className="text-[11px] text-zinc-300 leading-normal">
+                Want 24/7 auto-sync without opening the website? Add this variable in <strong>Vercel Project Settings &rarr; Environment Variables</strong>:
+              </p>
+              <div className="p-2 rounded-xl bg-black/60 font-mono text-[10px] text-indigo-300 select-all break-all border border-indigo-500/20">
+                Key: <strong>GOOGLE_CLASSROOM_REFRESH_TOKEN</strong>
+              </div>
+            </div>
+          )}
+
           <div className="p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs text-zinc-400">
-            <strong>Note:</strong> All Section D students can view and download mirrored PDFs without needing individual Google Cloud API setups.
+            <strong>All Classmates Covered:</strong> Once authorized, all 58 students in Section D can view and download mirrored PDFs without needing individual Google Cloud API setups.
           </div>
 
           <div className="pt-2 flex justify-end">
