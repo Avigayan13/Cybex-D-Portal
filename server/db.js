@@ -469,11 +469,21 @@ export const Database = {
   // GOOGLE CLASSROOM SYNC STORAGE
   // ==========================================
   getClassroomFeed() {
-    return db.classroomFeed || [];
+    return (db.classroomFeed || []).filter(item => 
+      item.id !== 'gc-os-unit3-threads' &&
+      item.id !== 'gc-dbms-er-sql-lab' &&
+      item.id !== 'gc-dcn-socket-prog' &&
+      item.id !== 'gc-math-discrete-recurrence'
+    );
   },
 
   saveClassroomFeed(items) {
-    db.classroomFeed = items;
+    db.classroomFeed = (items || []).filter(item => 
+      item.id !== 'gc-os-unit3-threads' &&
+      item.id !== 'gc-dbms-er-sql-lab' &&
+      item.id !== 'gc-dcn-socket-prog' &&
+      item.id !== 'gc-math-discrete-recurrence'
+    );
     saveDB();
     return db.classroomFeed;
   },

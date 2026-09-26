@@ -6,13 +6,27 @@ const DataContext = createContext(null);
 export function DataProvider({ children }) {
   const { token, user } = useAuth();
   
+  const cleanFeedItems = (list) => {
+    if (!Array.isArray(list)) return [];
+    return list.filter(item => 
+      item &&
+      item.id !== 'gc-os-unit3-threads' &&
+      item.id !== 'gc-dbms-er-sql-lab' &&
+      item.id !== 'gc-dcn-socket-prog' &&
+      item.id !== 'gc-math-discrete-recurrence'
+    );
+  };
+
   const [announcements, setAnnouncements] = useState([]);
   const [timetable, setTimetable] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [classroomFeed, setClassroomFeed] = useState(() => {
     try {
       const cached = localStorage.getItem('srmap_gc_feed');
-      return cached ? JSON.parse(cached) : [];
+      if (cached) {
+        return cleanFeedItems(JSON.parse(cached));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -84,9 +98,10 @@ export function DataProvider({ children }) {
       
       if (gcRes.ok) { 
         const d = await parseSafe(gcRes); 
-        if (d && Array.isArray(d) && d.length > 0) {
-          setClassroomFeed(d);
-          try { localStorage.setItem('srmap_gc_feed', JSON.stringify(d)); } catch {}
+        if (d && Array.isArray(d)) {
+          const cleaned = cleanFeedItems(d);
+          setClassroomFeed(cleaned);
+          try { localStorage.setItem('srmap_gc_feed', JSON.stringify(cleaned)); } catch {}
         }
       }
       
