@@ -58,6 +58,45 @@ function loadDB() {
         surveys: parsed.surveys || [],
         students: (parsed.students && parsed.students.length > 0) ? parsed.students : [...initialStudents]
       };
+
+      // Ensure Rajdeep Paudel is synchronized
+      const rajdeepIdx = db.students.findIndex(s => s.email === 'rajdeep_paudel@srmap.edu.in' || s.rollNumber === 'AP26110090265');
+      if (rajdeepIdx >= 0) {
+        db.students[rajdeepIdx] = {
+          ...db.students[rajdeepIdx],
+          rollNumber: "AP26110090265",
+          name: "RAJDEEP PAUDEL",
+          email: "rajdeep_paudel@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "Student"
+        };
+      } else {
+        db.students.push({
+          id: db.students.length + 1,
+          rollNumber: "AP26110090265",
+          name: "RAJDEEP PAUDEL",
+          email: "rajdeep_paudel@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "Student"
+        });
+      }
+
+      // Ensure user account is registered
+      if (!db.users.some(u => u.email === 'rajdeep_paudel@srmap.edu.in')) {
+        db.users.push({
+          email: "rajdeep_paudel@srmap.edu.in",
+          name: "RAJDEEP PAUDEL",
+          rollNumber: "AP26110090265",
+          section: "D",
+          batch: "2024-2028",
+          role: "student",
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      saveDB();
       console.log(`Database loaded successfully from file (${db.students.length} students enrolled).`);
     } else {
       saveDB();
