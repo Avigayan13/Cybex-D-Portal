@@ -814,20 +814,20 @@
     {
       "id": 58,
       "rollNumber": "AP26110090265",
-      "name": "RAJDEEP PAUDEL",
-      "email": "rajdeep_paudel@srmap.edu.in",
-      "section": "D",
-      "batch": "2024-2028",
-      "role": "Student"
-    },
-    {
-      "id": 59,
-      "rollNumber": "AP26110090266",
       "name": "AVIGAYAN JANA",
       "email": "avigayan_jana@srmap.edu.in",
       "section": "D",
       "batch": "2024-2028",
       "role": "CR"
+    },
+    {
+      "id": 59,
+      "rollNumber": "AP26110090269",
+      "name": "RAJDEEP PAUDEL",
+      "email": "rajdeep_paudel@srmap.edu.in",
+      "section": "D",
+      "batch": "2024-2028",
+      "role": "Student"
     }
   ],
   "surveys": [],
@@ -844,7 +844,7 @@
       "name": "AVIGAYAN JANA",
       "role": "admin",
       "createdAt": "2026-09-23T18:56:30.772Z",
-      "rollNumber": "AP26110090266",
+      "rollNumber": "AP26110090265",
       "section": "D",
       "batch": "2024-2028"
     },
@@ -852,7 +852,7 @@
       "email": "rajdeep_paudel@srmap.edu.in",
       "name": "RAJDEEP PAUDEL",
       "role": "student",
-      "rollNumber": "AP26110090265",
+      "rollNumber": "AP26110090269",
       "section": "D",
       "batch": "2024-2028",
       "createdAt": "2026-09-26T23:36:00.000Z"

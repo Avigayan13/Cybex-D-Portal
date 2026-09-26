@@ -104,7 +104,7 @@ export const initialStudents = [
   { id: 55, rollNumber: "AP26110090262", name: "SAI KOUSIK KATRAGADDA", email: "sai_kousik_katragadda@srmap.edu.in", section: "D", batch: "2024-2028", role: "Student" },
   { id: 56, rollNumber: "AP26110090263", name: "GUDIVADA JOTHI NAGA SAI SREEMAYEE", email: "gudivada_jothi_naga@srmap.edu.in", section: "D", batch: "2024-2028", role: "Student" },
   { id: 57, rollNumber: "AP26110090264", name: "SURAJ VISHWAKARMA", email: "suraj_vishwakarma@srmap.edu.in", section: "D", batch: "2024-2028", role: "Student" },
-  { id: 58, rollNumber: "AP26110090265", name: "RAJDEEP PAUDEL", email: "rajdeep_paudel@srmap.edu.in", section: "D", batch: "2024-2028", role: "Student" },
-  { id: 59, rollNumber: "AP26110090266", name: "AVIGAYAN JANA", email: "avigayan_jana@srmap.edu.in", section: "D", batch: "2024-2028", role: "CR" }
+  { id: 58, rollNumber: "AP26110090265", name: "AVIGAYAN JANA", email: "avigayan_jana@srmap.edu.in", section: "D", batch: "2024-2028", role: "CR" },
+  { id: 59, rollNumber: "AP26110090269", name: "RAJDEEP PAUDEL", email: "rajdeep_paudel@srmap.edu.in", section: "D", batch: "2024-2028", role: "Student" }
 ];
 

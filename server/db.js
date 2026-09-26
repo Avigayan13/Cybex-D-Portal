@@ -59,12 +59,26 @@ function loadDB() {
         students: (parsed.students && parsed.students.length > 0) ? parsed.students : [...initialStudents]
       };
 
+      // Ensure Avigayan Jana (CR) is synchronized
+      const aviIdx = db.students.findIndex(s => s.email === 'avigayan_jana@srmap.edu.in');
+      if (aviIdx >= 0) {
+        db.students[aviIdx] = {
+          ...db.students[aviIdx],
+          rollNumber: "AP26110090265",
+          name: "AVIGAYAN JANA",
+          email: "avigayan_jana@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "CR"
+        };
+      }
+
       // Ensure Rajdeep Paudel is synchronized
-      const rajdeepIdx = db.students.findIndex(s => s.email === 'rajdeep_paudel@srmap.edu.in' || s.rollNumber === 'AP26110090265');
+      const rajdeepIdx = db.students.findIndex(s => s.email === 'rajdeep_paudel@srmap.edu.in' || s.rollNumber === 'AP26110090269');
       if (rajdeepIdx >= 0) {
         db.students[rajdeepIdx] = {
           ...db.students[rajdeepIdx],
-          rollNumber: "AP26110090265",
+          rollNumber: "AP26110090269",
           name: "RAJDEEP PAUDEL",
           email: "rajdeep_paudel@srmap.edu.in",
           section: "D",
@@ -74,7 +88,7 @@ function loadDB() {
       } else {
         db.students.push({
           id: db.students.length + 1,
-          rollNumber: "AP26110090265",
+          rollNumber: "AP26110090269",
           name: "RAJDEEP PAUDEL",
           email: "rajdeep_paudel@srmap.edu.in",
           section: "D",
@@ -83,17 +97,26 @@ function loadDB() {
         });
       }
 
-      // Ensure user account is registered
-      if (!db.users.some(u => u.email === 'rajdeep_paudel@srmap.edu.in')) {
+      // Ensure user account is registered with correct roll
+      const rajdeepUser = db.users.find(u => u.email === 'rajdeep_paudel@srmap.edu.in');
+      if (rajdeepUser) {
+        rajdeepUser.rollNumber = "AP26110090269";
+        rajdeepUser.name = "RAJDEEP PAUDEL";
+      } else {
         db.users.push({
           email: "rajdeep_paudel@srmap.edu.in",
           name: "RAJDEEP PAUDEL",
-          rollNumber: "AP26110090265",
+          rollNumber: "AP26110090269",
           section: "D",
           batch: "2024-2028",
           role: "student",
           createdAt: new Date().toISOString()
         });
+      }
+
+      const aviUser = db.users.find(u => u.email === 'avigayan_jana@srmap.edu.in');
+      if (aviUser) {
+        aviUser.rollNumber = "AP26110090265";
       }
 
       saveDB();
