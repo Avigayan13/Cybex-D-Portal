@@ -46,6 +46,9 @@ export default function Navbar({ activeTab, setActiveTab }) {
     setActiveTab(item.id);
   };
 
+  const isCRUser = isAdmin || user?.email === 'avigayan_jana@srmap.edu.in' || user?.rollNumber === 'AP26110090265';
+  const displayName = isCRUser ? 'AVIGAYAN JANA' : (user?.name && user?.name !== 'Class Representative' && user?.name !== 'CYBEX D - Class Representative' ? user.name : (user?.email ? user.email.split('@')[0] : 'Student'));
+
   return (
     <>
       <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
@@ -146,17 +149,17 @@ export default function Navbar({ activeTab, setActiveTab }) {
                   title="My Info & Account Details"
                 >
                   <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center text-xs font-black shadow-md">
-                    {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                    {isCRUser ? 'CR' : displayName.charAt(0).toUpperCase()}
                   </div>
                   
                   <div className="hidden sm:block text-left">
                     <p className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
-                      {user.name || user.email.split('@')[0]}
+                      {displayName}
                     </p>
                     <p className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
-                      {isAdmin ? (
-                        <span className="text-emerald-400 flex items-center gap-0.5">
-                          <Sparkles className="w-2.5 h-2.5" /> Class Rep (Admin)
+                      {isCRUser ? (
+                        <span className="text-emerald-400 flex items-center gap-0.5 font-bold">
+                          <Sparkles className="w-2.5 h-2.5" /> CR ({rollNumber})
                         </span>
                       ) : (
                         <span className="text-zinc-400">{rollNumber}</span>
@@ -189,17 +192,17 @@ export default function Navbar({ activeTab, setActiveTab }) {
             <div className="flex items-start justify-between gap-3 pb-3.5 border-b border-white/10">
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-white to-zinc-300 text-black flex items-center justify-center text-base font-black shadow-xl shrink-0">
-                  {isAdmin ? 'CR' : user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                  {isCRUser ? 'CR' : displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="overflow-hidden">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-black text-white truncate">{user.name || 'SRM AP Student'}</h3>
+                    <h3 className="text-sm font-black text-white truncate">{displayName}</h3>
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" title="Verified SRM AP Student" />
                   </div>
                   <p className="text-xs text-zinc-400 font-mono tracking-wide truncate">{user.email}</p>
                   <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/15">
                     <GraduationCap className="w-3 h-3" />
-                    {isAdmin ? 'Class Representative (CR)' : 'Enrolled Student'}
+                    {isCRUser ? 'Class Representative (CR)' : 'Enrolled Student'}
                   </span>
                 </div>
               </div>

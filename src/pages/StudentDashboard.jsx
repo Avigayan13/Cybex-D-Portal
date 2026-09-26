@@ -57,12 +57,12 @@ export default function StudentDashboard({ onNavigate }) {
             </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight flex items-center gap-2.5">
-              <span>Hello, {user?.name || 'Student'}</span>
+              <span>Hello, {isAdmin || user?.email === 'avigayan_jana@srmap.edu.in' || user?.rollNumber === 'AP26110090265' ? 'AVIGAYAN JANA' : (user?.name && user?.name !== 'Class Representative' ? user.name : 'Student')}</span>
               <span className="inline-block hover:rotate-12 transition-transform cursor-pointer origin-[70%_70%]">👋</span>
             </h1>
 
             <p className="text-xs text-zinc-400 font-medium hidden sm:block">
-              {user?.rollNumber ? `Verified Student (${user.rollNumber}) • Cyber Security - Section D` : 'Cyber Security Section D Portal'}
+              {user?.rollNumber || (isAdmin ? 'AP26110090265' : null) ? `Verified Student (${isAdmin ? 'AP26110090265' : user.rollNumber}) • Cyber Security - Section D` : 'Cyber Security Section D Portal'}
             </p>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function StudentDashboard({ onNavigate }) {
           {isAdmin ? (
             <button
               onClick={() => onNavigate('admin')}
-              className="px-5 py-3 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-xs shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105 transition flex items-center gap-2"
+              className="px-5 py-3 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black text-xs shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105 transition flex items-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Open CR Control Panel</span>
@@ -80,7 +80,7 @@ export default function StudentDashboard({ onNavigate }) {
           ) : (
             <div className="text-right hidden md:block liquid-glass-pill px-4 py-2 rounded-2xl border border-white/10">
               <p className="text-xs font-bold text-white">CSE Section D</p>
-              <p className="text-[11px] text-zinc-400">Representative: {portalConfig.adminName}</p>
+              <p className="text-[11px] text-zinc-400">Representative: AVIGAYAN JANA (CR)</p>
             </div>
           )}
         </div>
