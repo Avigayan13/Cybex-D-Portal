@@ -196,13 +196,37 @@ export const ClassroomService = {
 
     const classroom = google.classroom({ version: 'v1', auth });
     
-    // 1. Fetch all active courses
-    const coursesRes = await classroom.courses.list({
-      courseStates: ['ACTIVE'],
-      pageSize: 20
-    });
+    // 1. Fetch active courses where user is enrolled as Student or Teacher
+    let courses = [];
+    try {
+      const studentCoursesRes = await classroom.courses.list({
+        studentId: 'me',
+        courseStates: ['ACTIVE'],
+        pageSize: 30
+      });
+      if (studentCoursesRes.data.courses) {
+        courses.push(...studentCoursesRes.data.courses);
+      }
+    } catch (e) {
+      console.warn('[CLASSROOM] student courses query note:', e.message);
+    }
 
-    const courses = coursesRes.data.courses || [];
+    try {
+      const allCoursesRes = await classroom.courses.list({
+        courseStates: ['ACTIVE'],
+        pageSize: 30
+      });
+      if (allCoursesRes.data.courses) {
+        for (const c of allCoursesRes.data.courses) {
+          if (!courses.some(existing => existing.id === c.id)) {
+            courses.push(c);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[CLASSROOM] all courses query note:', e.message);
+    }
+
     const allItems = [];
 
     for (const course of courses) {
@@ -363,16 +387,34 @@ export const ClassroomService = {
       }
     }
 
-    // Sort by latest update / creation
-    allItems.sort((a, b) => new Date(b.creationTime) - new Date(a.creationTime));
+    // Merge newly fetched items with existing feed and pre-seeded Section D courses
+    const existing = Database.getClassroomFeed() || [];
+    const mergedMap = new Map();
 
-    if (allItems.length > 0) {
-      Database.saveClassroomFeed(allItems);
-      return allItems;
+    // 1. Add all fetched items
+    for (const item of allItems) {
+      if (item && item.id) mergedMap.set(item.id, item);
     }
 
-    // Fallback if no courses found
-    return Database.getClassroomFeed();
+    // 2. Add existing cached items
+    for (const item of existing) {
+      if (item && item.id && !mergedMap.has(item.id)) {
+        mergedMap.set(item.id, item);
+      }
+    }
+
+    // 3. Ensure baseline Section D courses are always available
+    for (const item of initialClassroomFeed) {
+      if (item && item.id && !mergedMap.has(item.id)) {
+        mergedMap.set(item.id, item);
+      }
+    }
+
+    const finalFeed = Array.from(mergedMap.values());
+    finalFeed.sort((a, b) => new Date(b.creationTime || 0) - new Date(a.creationTime || 0));
+
+    Database.saveClassroomFeed(finalFeed);
+    return finalFeed;
   },
 
   getFeed() {
