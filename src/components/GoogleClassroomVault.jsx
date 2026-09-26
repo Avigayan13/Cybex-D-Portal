@@ -28,7 +28,11 @@ import {
   Bookmark,
   ChevronDown,
   ChevronUp,
-  BookMarked
+  BookMarked,
+  Maximize2,
+  Share2,
+  Paperclip,
+  Info
 } from 'lucide-react';
 
 // ==========================================
@@ -96,14 +100,6 @@ function DoodleAtom({ className = "w-6 h-6 text-cyan-300" }) {
   );
 }
 
-function DoodlePaperclip({ className = "w-5 h-5 text-zinc-400" }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-    </svg>
-  );
-}
-
 export default function GoogleClassroomVault() {
   const { isAdmin } = useAuth();
   const { classroomFeed, classroomStatus, syncClassroomFeed, connectGoogleClassroom, disconnectGoogleClassroom } = useData();
@@ -115,6 +111,7 @@ export default function GoogleClassroomVault() {
   const [syncing, setSyncing] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [selectedItemDetail, setSelectedItemDetail] = useState(null);
   const [copiedToken, setCopiedToken] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState({});
 
@@ -142,7 +139,7 @@ export default function GoogleClassroomVault() {
   const groupedCourses = useMemo(() => {
     const groups = {};
     for (const item of filteredFeed) {
-      const subject = item.courseName || item.courseCode || 'General Section D Course';
+      const subject = item.courseName || item.courseCode || 'Section D Course';
       if (!groups[subject]) {
         groups[subject] = {
           courseName: subject,
@@ -292,7 +289,7 @@ export default function GoogleClassroomVault() {
             </h1>
             
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-              Mirroring lecture notes, reference PDFs, lab manuals, and notices organized neatly by classroom subjects for all Section D classmates.
+              Mirroring lecture notes, reference PDFs, lab manuals, and notices organized side-by-side by classroom subjects.
             </p>
           </div>
 
@@ -355,15 +352,15 @@ export default function GoogleClassroomVault() {
         {/* Academic Quick Stat Chips */}
         <div className="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800/80">
           <div className="bg-slate-800/40 rounded-2xl p-3 text-center border border-slate-700/50">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subjects Enrolled</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subjects</span>
             <span className="text-xl font-bold font-serif text-white">{stats.totalSubjects}</span>
           </div>
           <div className="bg-slate-800/40 rounded-2xl p-3 text-center border border-slate-700/50">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PDFs & Documents</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PDFs & Docs</span>
             <span className="text-xl font-bold font-serif text-cyan-300">{stats.pdfCount}</span>
           </div>
           <div className="bg-slate-800/40 rounded-2xl p-3 text-center border border-slate-700/50">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Materials</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Materials</span>
             <span className="text-xl font-bold font-serif text-amber-300">{stats.totalItems}</span>
           </div>
         </div>
@@ -383,7 +380,7 @@ export default function GoogleClassroomVault() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by topic, unit name, faculty, or PDF filename..."
+              placeholder="Search by topic, unit name, faculty, assignment, or PDF..."
               className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:text-sm font-medium transition"
             />
             {searchTerm && (
@@ -402,7 +399,7 @@ export default function GoogleClassroomVault() {
               { id: 'All', label: 'All Resources' },
               { id: 'material', label: '📄 Notes & PDFs' },
               { id: 'announcement', label: '📌 Notices' },
-              { id: 'assignment', label: '📝 Lab & Assignments' }
+              { id: 'assignment', label: '📝 Assignments' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -423,7 +420,7 @@ export default function GoogleClassroomVault() {
         {courseNamesList.length > 1 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 scrollbar-thin">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 pl-1 flex-shrink-0">
-              <Bookmark className="w-3.5 h-3.5 text-amber-400" /> Subjects:
+              <Bookmark className="w-3.5 h-3.5 text-amber-400" /> Filter:
             </span>
             <button
               onClick={() => setSelectedSubjectTab('All')}
@@ -453,7 +450,7 @@ export default function GoogleClassroomVault() {
       </div>
 
       {/* ========================================== */}
-      {/* SECTIONS FOR DIFFERENT CLASSROOM SUBJECTS */}
+      {/* SUBJECTS SIDE BY SIDE GRID (2-Column Grid) */}
       {/* ========================================== */}
       {Object.keys(displayedGroups).length === 0 ? (
         <div className="bg-slate-900/60 rounded-3xl p-12 text-center space-y-4 border border-slate-800 relative overflow-hidden">
@@ -506,7 +503,8 @@ export default function GoogleClassroomVault() {
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
+        /* SIDE BY SIDE RESPONSIVE GRID LAYOUT */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {Object.entries(displayedGroups).map(([subjectName, group], groupIdx) => {
             const isCollapsed = Boolean(collapsedSections[subjectName]);
             const pdfsInGroup = group.items.reduce((acc, it) => {
@@ -516,35 +514,35 @@ export default function GoogleClassroomVault() {
             return (
               <div 
                 key={subjectName} 
-                className="bg-slate-900/70 border border-slate-800 rounded-3xl overflow-hidden shadow-lg transition-all"
+                className="bg-slate-900/80 border border-slate-800/90 rounded-3xl overflow-hidden shadow-lg transition-all flex flex-col justify-between"
               >
-                {/* SECTION HEADER: Subject Folder Shelf */}
+                {/* SUBJECT SECTION HEADER */}
                 <div 
                   onClick={() => toggleSection(subjectName)}
-                  className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800/80 flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-850/80 transition select-none"
+                  className="p-5 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800/80 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-850 transition select-none"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-950/60 border border-indigo-700/40 text-indigo-300 flex items-center justify-center flex-shrink-0 shadow-inner">
-                      {groupIdx % 3 === 0 && <DoodleBook className="w-5 h-5 text-amber-300" />}
-                      {groupIdx % 3 === 1 && <DoodleAtom className="w-5 h-5 text-cyan-300" />}
-                      {groupIdx % 3 === 2 && <DoodlePencil className="w-5 h-5 text-emerald-300" />}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-950/70 border border-indigo-700/40 text-indigo-300 flex items-center justify-center flex-shrink-0 shadow-inner">
+                      {groupIdx % 3 === 0 && <DoodleBook className="w-4 h-4 text-amber-300" />}
+                      {groupIdx % 3 === 1 && <DoodleAtom className="w-4 h-4 text-cyan-300" />}
+                      {groupIdx % 3 === 2 && <DoodlePencil className="w-4 h-4 text-emerald-300" />}
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-base sm:text-lg font-serif font-bold text-white truncate">
+                        <h2 className="text-base font-serif font-bold text-white truncate">
                           {subjectName}
                         </h2>
                         {group.courseCode && (
-                          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700">
+                          <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300 border border-slate-700">
                             {group.courseCode}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                        <span>Instructor: <strong className="text-slate-300 font-medium">{group.faculty}</strong></span>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <span className="truncate">{group.faculty}</span>
                         <span>&bull;</span>
-                        <span>{group.items.length} {group.items.length === 1 ? 'post' : 'posts'}</span>
+                        <span className="text-indigo-300 font-semibold">{group.items.length} {group.items.length === 1 ? 'item' : 'items'}</span>
                         {pdfsInGroup > 0 && (
                           <>
                             <span>&bull;</span>
@@ -555,12 +553,9 @@ export default function GoogleClassroomVault() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs text-slate-400 hidden sm:inline">
-                      {isCollapsed ? 'Expand' : 'Collapse'}
-                    </span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button 
-                      className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white"
+                      className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition"
                       aria-label="Toggle Section"
                     >
                       {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
@@ -568,18 +563,19 @@ export default function GoogleClassroomVault() {
                   </div>
                 </div>
 
-                {/* SECTION BODY: Grid of Cards for this subject */}
+                {/* SUBJECT SECTION BODY: Scrollable/Stack of items in this subject */}
                 {!isCollapsed && (
-                  <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/40">
+                  <div className="p-4 space-y-3.5 bg-slate-950/30 max-h-[750px] overflow-y-auto scrollbar-thin">
                     {group.items.map((item) => (
                       <div 
                         key={item.id}
-                        className="bg-slate-900/90 border border-slate-800/90 hover:border-indigo-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-3.5 transition shadow-sm hover:shadow-md group relative"
+                        onClick={() => setSelectedItemDetail({ ...item, courseName: subjectName })}
+                        className="bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-4 flex flex-col justify-between space-y-3 transition shadow-sm hover:shadow-md cursor-pointer group relative hover:bg-slate-850/90"
                       >
-                        {/* Card Header */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-2 text-[11px]">
-                            <span className={`px-2.5 py-0.5 rounded-full font-semibold border ${
+                        {/* Card Header & Title */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-2 text-[10px]">
+                            <span className={`px-2 py-0.5 rounded-full font-semibold border ${
                               item.type === 'assignment'
                                 ? 'bg-purple-500/10 text-purple-300 border-purple-500/20'
                                 : item.type === 'announcement'
@@ -595,64 +591,63 @@ export default function GoogleClassroomVault() {
                             </span>
                           </div>
 
-                          <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-indigo-200 transition-colors leading-snug">
+                          <h3 className="text-sm font-bold text-white group-hover:text-indigo-200 transition-colors leading-snug line-clamp-2">
                             {item.title}
                           </h3>
 
                           {item.text && (
-                            <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed font-normal whitespace-pre-line">
+                            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed font-normal">
                               {item.text}
                             </p>
                           )}
                         </div>
 
-                        {/* Card Attachments & Footer */}
-                        <div className="space-y-2.5 pt-2.5 border-t border-slate-800/80">
+                        {/* Card Footer: Due Date & Attachments */}
+                        <div className="space-y-2 pt-2 border-t border-slate-800/80">
                           {item.dueDate && (
                             <div className="text-[11px] text-amber-300 font-semibold flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              <span>Submission Deadline: {item.dueDate}</span>
+                              <span>Due: {item.dueDate}</span>
                             </div>
                           )}
 
+                          {/* Quick Attachment Pills */}
                           {(item.attachments && item.attachments.length > 0) ? (
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                               {item.attachments.map((att, attIdx) => {
                                 const isPdf = att.fileType === 'pdf' || (att.title || '').toLowerCase().endsWith('.pdf');
                                 return (
                                   <div 
                                     key={attIdx}
-                                    className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3"
+                                    className="p-2 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-2"
+                                    onClick={(e) => e.stopPropagation()}
                                   >
                                     <div className="flex items-center gap-2 min-w-0">
-                                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${
                                         isPdf ? 'bg-rose-500/15 text-rose-400' : 'bg-indigo-500/15 text-indigo-400'
                                       }`}>
-                                        {isPdf ? <FileText className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5" />}
+                                        {isPdf ? <FileText className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
                                       </div>
-                                      <div className="min-w-0">
-                                        <p className="text-xs font-semibold text-slate-200 truncate">
-                                          {att.title}
-                                        </p>
-                                        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                                          {isPdf ? 'PDF Slide/Doc' : (att.fileType || 'Drive Link')}
-                                        </span>
-                                      </div>
+                                      <span className="text-xs font-semibold text-slate-200 truncate">
+                                        {att.title}
+                                      </span>
                                     </div>
 
-                                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    <div className="flex items-center gap-1 flex-shrink-0">
                                       {isPdf && att.driveFileId && (
                                         <button
-                                          onClick={() => setPreviewFile({
-                                            title: att.title,
-                                            url: `https://drive.google.com/file/d/${att.driveFileId}/preview`,
-                                            downloadUrl: att.url || att.alternateLink
-                                          })}
-                                          className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer"
-                                          title="Quick Preview PDF"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setPreviewFile({
+                                              title: att.title,
+                                              url: `https://drive.google.com/file/d/${att.driveFileId}/preview`,
+                                              downloadUrl: att.url || att.alternateLink
+                                            });
+                                          }}
+                                          className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold transition cursor-pointer"
+                                          title="Preview PDF"
                                         >
-                                          <Eye className="w-3 h-3" />
-                                          <span className="hidden sm:inline">Preview</span>
+                                          Preview
                                         </button>
                                       )}
 
@@ -660,10 +655,11 @@ export default function GoogleClassroomVault() {
                                         href={att.url || att.alternateLink || '#'}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold transition flex items-center gap-1 shadow-sm"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="px-2 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold transition flex items-center gap-1"
                                       >
-                                        <span>{isPdf ? 'Open PDF' : 'View'}</span>
-                                        <ExternalLink className="w-3 h-3" />
+                                        <span>View</span>
+                                        <ExternalLink className="w-2.5 h-2.5" />
                                       </a>
                                     </div>
                                   </div>
@@ -671,8 +667,12 @@ export default function GoogleClassroomVault() {
                               })}
                             </div>
                           ) : (
-                            <div className="text-[11px] text-slate-500 italic">
-                              Classroom announcement notice.
+                            <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                              <span className="italic">Announcement text</span>
+                              <span className="text-indigo-400 font-semibold group-hover:underline flex items-center gap-0.5 text-[10px]">
+                                <span>Read details</span>
+                                <Maximize2 className="w-2.5 h-2.5" />
+                              </span>
                             </div>
                           )}
                         </div>
@@ -684,6 +684,145 @@ export default function GoogleClassroomVault() {
             );
           })}
         </div>
+      )}
+
+      {/* ========================================== */}
+      {/* EXPANDED DETAILS POPUP MODAL               */}
+      {/* ========================================== */}
+      {selectedItemDetail && (
+        <Modal
+          isOpen={Boolean(selectedItemDetail)}
+          onClose={() => setSelectedItemDetail(null)}
+          title={selectedItemDetail.title || 'Classroom Post Details'}
+        >
+          <div className="space-y-4 text-slate-200">
+            {/* Header Tags & Metadata */}
+            <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                  selectedItemDetail.type === 'assignment'
+                    ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
+                    : selectedItemDetail.type === 'announcement'
+                    ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                    : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
+                }`}>
+                  {selectedItemDetail.type === 'assignment' ? '📝 Assignment' : selectedItemDetail.type === 'announcement' ? '📌 Classroom Notice' : '📄 Lecture Material'}
+                </span>
+
+                <span className="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
+                  {selectedItemDetail.courseName || 'Section D Course'}
+                </span>
+              </div>
+
+              <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                <span>{formatTime(selectedItemDetail.creationTime)}</span>
+              </span>
+            </div>
+
+            {/* Instructor & Deadline Sub-banner */}
+            <div className="flex items-center justify-between gap-2 bg-slate-900/90 p-3 rounded-2xl border border-slate-800 text-xs">
+              <span className="flex items-center gap-2 text-slate-300 font-medium">
+                <User className="w-4 h-4 text-indigo-400" />
+                <span>Instructor: <strong className="text-white font-semibold">{selectedItemDetail.faculty || 'Course Instructor'}</strong></span>
+              </span>
+
+              {selectedItemDetail.dueDate && (
+                <span className="text-amber-300 font-bold flex items-center gap-1 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Due: {selectedItemDetail.dueDate}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Full Content Description */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Description & Instructions</span>
+              </h4>
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/90 text-xs sm:text-sm text-slate-300 leading-relaxed max-h-60 overflow-y-auto whitespace-pre-line font-normal select-text">
+                {selectedItemDetail.text || 'No detailed written instructions provided for this post.'}
+              </div>
+            </div>
+
+            {/* Attached Files Section */}
+            {(selectedItemDetail.attachments && selectedItemDetail.attachments.length > 0) && (
+              <div className="space-y-2 pt-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <Paperclip className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Attached Files & Documents ({selectedItemDetail.attachments.length})</span>
+                </h4>
+
+                <div className="space-y-2">
+                  {selectedItemDetail.attachments.map((att, idx) => {
+                    const isPdf = att.fileType === 'pdf' || (att.title || '').toLowerCase().endsWith('.pdf');
+                    return (
+                      <div 
+                        key={idx}
+                        className="p-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between gap-3"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                            isPdf ? 'bg-rose-500/20 text-rose-400' : 'bg-indigo-500/20 text-indigo-400'
+                          }`}>
+                            {isPdf ? <FileText className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-white truncate">
+                              {att.title}
+                            </p>
+                            <span className="text-[10px] text-slate-400 uppercase tracking-widest font-mono">
+                              {isPdf ? 'PDF Slide / Document' : (att.fileType || 'Drive Attachment')}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {isPdf && att.driveFileId && (
+                            <button
+                              onClick={() => {
+                                setPreviewFile({
+                                  title: att.title,
+                                  url: `https://drive.google.com/file/d/${att.driveFileId}/preview`,
+                                  downloadUrl: att.url || att.alternateLink
+                                });
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Preview PDF</span>
+                            </button>
+                          )}
+
+                          <a
+                            href={att.url || att.alternateLink || '#'}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                          >
+                            <span>Open in Drive</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Bottom Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <button
+                onClick={() => setSelectedItemDetail(null)}
+                className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </Modal>
       )}
 
       {/* ========================================== */}
@@ -749,7 +888,7 @@ export default function GoogleClassroomVault() {
               <li>Click <strong>Connect Google Account</strong> as Class Representative.</li>
               <li>Sign in with your institutional SRM AP Google account (<code>avigayan_jana@srmap.edu.in</code>).</li>
               <li>Grant Read-Only permissions for Google Classroom courses and Drive attachments.</li>
-              <li>Your Section D courses will instantly sync and be organized by subject for all classmates.</li>
+              <li>Your Section D courses will instantly sync and be organized side-by-side by subject for all classmates.</li>
             </ol>
           </div>
 
@@ -785,7 +924,7 @@ export default function GoogleClassroomVault() {
           <div className="pt-2 flex justify-end">
             <button
               onClick={() => setIsHelpModalOpen(false)}
-              className="px-5 py-2 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition"
+              className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition"
             >
               Got It
             </button>
