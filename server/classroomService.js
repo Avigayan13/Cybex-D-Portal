@@ -23,103 +23,7 @@ function getOAuth2Client(redirectUri) {
   return new google.auth.OAuth2(clientId, clientSecret, callbackUrl);
 }
 
-// Initial Sample Section D Classroom Feed (Pre-seeded for instant UX)
-export const initialClassroomFeed = [
-  {
-    id: 'gc-os-unit3-threads',
-    courseId: 'cse203-os',
-    courseName: 'Operating Systems (CSE 203)',
-    courseCode: 'CSE 203',
-    section: 'Section D',
-    faculty: 'Dr. Faculty (Operating Systems)',
-    title: 'Unit 3: Multithreading Models & POSIX Pthreads Notes + PDF',
-    text: 'Dear Students, please find attached the complete lecture slides and reference notes on CPU Scheduling and POSIX Pthreads for Unit 3. Review for upcoming lab evaluations.',
-    type: 'material',
-    creationTime: new Date(Date.now() - 3600 * 1000 * 5).toISOString(),
-    updateTime: new Date(Date.now() - 3600 * 1000 * 5).toISOString(),
-    attachments: [
-      {
-        title: 'OS_Unit_3_Multithreading_Scheduling.pdf',
-        fileType: 'pdf',
-        url: 'https://drive.google.com',
-        alternateLink: 'https://drive.google.com',
-        hasDirectPreview: true
-      },
-      {
-        title: 'POSIX_Pthreads_Lab_Codes.c',
-        fileType: 'code',
-        url: 'https://drive.google.com',
-        alternateLink: 'https://drive.google.com'
-      }
-    ]
-  },
-  {
-    id: 'gc-dbms-er-sql-lab',
-    courseId: 'cse202-dbms',
-    courseName: 'Database Management Systems (CSE 202)',
-    courseCode: 'CSE 202',
-    section: 'Section D',
-    faculty: 'Faculty (DBMS)',
-    title: 'Lab Sheet 4: Complex SQL Queries & Joins Practice PDF',
-    text: 'Complete all queries from Lab Sheet 4 before Friday S 312 session. Submission via portal or classroom assignment tab.',
-    type: 'assignment',
-    creationTime: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
-    updateTime: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
-    attachments: [
-      {
-        title: 'DBMS_Lab_Sheet_4_SQL_Joins_Subqueries.pdf',
-        fileType: 'pdf',
-        url: 'https://drive.google.com',
-        alternateLink: 'https://drive.google.com',
-        hasDirectPreview: true
-      }
-    ]
-  },
-  {
-    id: 'gc-dcn-socket-prog',
-    courseId: 'cse205-dcn',
-    courseName: 'Data Communications & Networking (CSE 205)',
-    courseCode: 'CSE 205',
-    section: 'Section D',
-    faculty: 'Dr. Faculty (DCN)',
-    title: 'Lecture Slides: OSI Model vs TCP/IP & IP Subnetting Formulae',
-    text: 'Please review the attached Class slides for Class 12 on CIDR Subnetting, IP Addressing, and Routing protocols.',
-    type: 'material',
-    creationTime: new Date(Date.now() - 3600 * 1000 * 32).toISOString(),
-    updateTime: new Date(Date.now() - 3600 * 1000 * 32).toISOString(),
-    attachments: [
-      {
-        title: 'DCN_Class_12_Subnetting_CIDR_Formulas.pdf',
-        fileType: 'pdf',
-        url: 'https://drive.google.com',
-        alternateLink: 'https://drive.google.com',
-        hasDirectPreview: true
-      }
-    ]
-  },
-  {
-    id: 'gc-math-discrete-recurrence',
-    courseId: 'mat201-dm',
-    courseName: 'Discrete Mathematics (MAT 201)',
-    courseCode: 'MAT 201',
-    section: 'Section D',
-    faculty: 'Prof. Faculty (Math)',
-    title: 'Tutorial Sheet 3: Generating Functions & Recurrence Relations',
-    text: 'Tutorial 3 solutions and unsolved problems for midterm exam prep. Solve questions 1 through 12.',
-    type: 'material',
-    creationTime: new Date(Date.now() - 3600 * 1000 * 55).toISOString(),
-    updateTime: new Date(Date.now() - 3600 * 1000 * 55).toISOString(),
-    attachments: [
-      {
-        title: 'Discrete_Math_Tutorial_3_Recurrence_Relations.pdf',
-        fileType: 'pdf',
-        url: 'https://drive.google.com',
-        alternateLink: 'https://drive.google.com',
-        hasDirectPreview: true
-      }
-    ]
-  }
-];
+export const initialClassroomFeed = [];
 
 export const ClassroomService = {
   isConfigured() {
@@ -204,12 +108,7 @@ export const ClassroomService = {
   async syncClassroomFeed(redirectUri, customTokens = null) {
     const auth = await this.getAuthenticatedClient(redirectUri, customTokens);
     if (!auth) {
-      // If not authenticated, return existing feed
-      const existing = Database.getClassroomFeed();
-      if (!existing || existing.length === 0) {
-        Database.saveClassroomFeed(initialClassroomFeed);
-      }
-      return Database.getClassroomFeed();
+      return Database.getClassroomFeed() || [];
     }
 
     const classroom = google.classroom({ version: 'v1', auth });
@@ -481,24 +380,17 @@ export const ClassroomService = {
       }
     }
 
-    // Merge newly fetched items with existing feed and pre-seeded Section D courses
+    // Merge newly fetched items with existing feed
     const existing = Database.getClassroomFeed() || [];
     const mergedMap = new Map();
 
-    // 1. Add all fetched items
+    // 1. Add all newly fetched items
     for (const item of allItems) {
       if (item && item.id) mergedMap.set(item.id, item);
     }
 
     // 2. Add existing cached items
     for (const item of existing) {
-      if (item && item.id && !mergedMap.has(item.id)) {
-        mergedMap.set(item.id, item);
-      }
-    }
-
-    // 3. Ensure baseline Section D courses are always available
-    for (const item of initialClassroomFeed) {
       if (item && item.id && !mergedMap.has(item.id)) {
         mergedMap.set(item.id, item);
       }
@@ -512,11 +404,6 @@ export const ClassroomService = {
   },
 
   getFeed() {
-    const feed = Database.getClassroomFeed();
-    if (!feed || feed.length === 0) {
-      Database.saveClassroomFeed(initialClassroomFeed);
-      return initialClassroomFeed;
-    }
-    return feed;
+    return Database.getClassroomFeed() || [];
   }
 };
