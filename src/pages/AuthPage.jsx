@@ -21,6 +21,7 @@ export default function AuthPage({ initialRole = 'student', onBack, onSuccess })
   const [name, setName] = useState('');
   const [otp, setOtp] = useState('');
   const [generatedOtp, setGeneratedOtp] = useState('');
+  const [challengeToken, setChallengeToken] = useState(null);
   const [emailSent, setEmailSent] = useState(false);
   const [detectedStudent, setDetectedStudent] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,6 +42,7 @@ export default function AuthPage({ initialRole = 'student', onBack, onSuccess })
       const data = await requestOtp(cleanInput, name);
       if (data.email) setEmail(data.email);
       setGeneratedOtp(data.previewOtp || '');
+      if (data.challengeToken) setChallengeToken(data.challengeToken);
       setEmailSent(Boolean(data.emailSent));
       if (data.detectedName) {
         setName(data.detectedName);
@@ -67,7 +69,7 @@ export default function AuthPage({ initialRole = 'student', onBack, onSuccess })
 
     setLoading(true);
     try {
-      const user = await verifyOtp(email.trim().toLowerCase(), otp.trim(), name);
+      const user = await verifyOtp(email.trim().toLowerCase(), otp.trim(), name, challengeToken);
       addToast(`Welcome back, ${user.name}! Logged in as ${user.role === 'admin' ? 'Class Representative' : 'Student'}.`, 'success');
       if (onSuccess) onSuccess(user);
     } catch (err) {
@@ -189,32 +191,33 @@ export default function AuthPage({ initialRole = 'student', onBack, onSuccess })
                 </p>
               </div>
 
-              {/* Real Email vs Dev simulated alert */}
-              {emailSent ? (
-                <div className="p-3.5 rounded-2xl liquid-glass text-xs text-emerald-300 border border-emerald-500/30 flex items-center gap-2">
+              {/* Real Email status notice */}
+              {emailSent && (
+                <div className="p-3 rounded-2xl liquid-glass text-xs text-emerald-300 border border-emerald-500/30 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Real verification email sent to <strong>{email}</strong>. Please check your SRM AP inbox!</span>
+                  <span>Verification code dispatched to <strong>{email}</strong>.</span>
                 </div>
-              ) : (
-                generatedOtp && (
-                  <div className="p-3.5 rounded-2xl liquid-glass text-xs text-zinc-200 flex items-center justify-between gap-2 border border-white/20">
-                    <div>
-                      <span className="font-bold text-zinc-400 flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-white" /> Verification OTP:
-                      </span>
-                      <span className="text-base font-mono font-black tracking-widest text-white ml-0.5">
-                        {generatedOtp}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleAutofillOtp}
-                      className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-[11px] shadow transition hover:scale-105"
-                    >
-                      Auto-Fill
-                    </button>
+              )}
+
+              {/* Instant Verification Code Card with Auto-Fill */}
+              {generatedOtp && (
+                <div className="p-3.5 rounded-2xl liquid-glass text-xs text-zinc-200 flex items-center justify-between gap-2 border border-white/20">
+                  <div>
+                    <span className="font-bold text-zinc-400 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Verification Code:
+                    </span>
+                    <span className="text-base font-mono font-black tracking-widest text-white ml-0.5">
+                      {generatedOtp}
+                    </span>
                   </div>
-                )
+                  <button
+                    type="button"
+                    onClick={handleAutofillOtp}
+                    className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-black text-xs shadow transition hover:scale-105 cursor-pointer"
+                  >
+                    Auto-Fill OTP
+                  </button>
+                </div>
               )}
 
               <div>

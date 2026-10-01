@@ -84,11 +84,11 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  const verifyOtp = async (email, otp, name) => {
+  const verifyOtp = async (email, otp, name, challengeToken = null) => {
     const res = await fetch('/api/auth/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, otp, name })
+      body: JSON.stringify({ email, otp, name, challengeToken })
     });
     const data = await safeJson(res);
     if (!res.ok) {

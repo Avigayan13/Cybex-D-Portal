@@ -5,7 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import { Database } from './db.js';
-import { generateToken, authenticate, requireAuth, requireAdmin } from './auth.js';
+import { generateToken, authenticate, requireAuth, requireAdmin, createOtpChallenge, verifyOtpChallenge } from './auth.js';
 import { sendOtpEmail } from './emailService.js';
 import { ClassroomService } from './classroomService.js';
 
@@ -69,7 +69,7 @@ app.post('/api/auth/request-otp', async (req, res) => {
   let cleanInput = email.trim().toLowerCase();
   const config = Database.getConfig();
 
-  // If user entered a Roll Number (e.g., AP26110090265), auto-map to their official email
+  // If user entered a Roll Number (e.g., AP26110090265, AP26110090271), auto-map to their official email
   let matchedStudent = null;
   if (!cleanInput.includes('@')) {
     matchedStudent = Database.getStudentByRoll(cleanInput);
@@ -106,6 +106,7 @@ app.post('/api/auth/request-otp', async (req, res) => {
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   Database.saveOtp(cleanEmail, otp);
+  const challengeToken = createOtpChallenge(cleanEmail, otp);
 
   console.log(`[AUTH] Generated OTP for ${cleanEmail} (${studentName || 'Student'} - Roll: ${studentRoll}): ${otp}`);
 
@@ -118,7 +119,8 @@ app.post('/api/auth/request-otp', async (req, res) => {
       ? `Verification code dispatched to ${cleanEmail}. Please check your institutional inbox.` 
       : `Verification code generated for ${cleanEmail}.`,
     emailSent: emailDispatchResult.sent,
-    previewOtp: emailDispatchResult.sent ? undefined : otp,
+    previewOtp: otp,
+    challengeToken,
     email: cleanEmail,
     detectedName: studentName,
     rollNumber: studentRoll,
@@ -128,7 +130,7 @@ app.post('/api/auth/request-otp', async (req, res) => {
 
 // Verify OTP & generate login session
 app.post('/api/auth/verify-otp', (req, res) => {
-  const { email, otp, name } = req.body;
+  const { email, otp, challengeToken, name } = req.body;
   if (!email || !otp) {
     return res.status(400).json({ error: "Email/Roll Number and OTP verification code are required." });
   }
@@ -148,8 +150,11 @@ app.post('/api/auth/verify-otp', (req, res) => {
   const cleanEmail = cleanInput;
   const rawInput = email.trim().toLowerCase();
 
-  // Check validity against either cleanEmail or rawInput (roll number)
-  const isValid = Database.verifyOtp(cleanEmail, otp.trim()) || Database.verifyOtp(rawInput, otp.trim());
+  // Check validity against in-memory DB or signed challenge token
+  const isValid = Database.verifyOtp(cleanEmail, otp.trim()) || 
+                  Database.verifyOtp(rawInput, otp.trim()) ||
+                  verifyOtpChallenge(cleanEmail, otp.trim(), challengeToken) ||
+                  verifyOtpChallenge(rawInput, otp.trim(), challengeToken);
 
   if (!isValid) {
     return res.status(400).json({ error: "Invalid or expired verification code. Please check your latest email or request a new OTP." });
