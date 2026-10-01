@@ -159,6 +159,46 @@ function loadDB() {
         });
       }
 
+      // Ensure Maxwel Moonga is synchronized
+      const maxwelIdx = db.students.findIndex(s => s.email === 'maxwel_moonga@srmap.edu.in' || s.rollNumber === 'AP26110090271');
+      if (maxwelIdx >= 0) {
+        db.students[maxwelIdx] = {
+          ...db.students[maxwelIdx],
+          rollNumber: "AP26110090271",
+          name: "MAXWEL MOONGA",
+          email: "maxwel_moonga@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "Student"
+        };
+      } else {
+        db.students.push({
+          id: db.students.length + 1,
+          rollNumber: "AP26110090271",
+          name: "MAXWEL MOONGA",
+          email: "maxwel_moonga@srmap.edu.in",
+          section: "D",
+          batch: "2024-2028",
+          role: "Student"
+        });
+      }
+
+      const maxwelUser = db.users.find(u => u.email === 'maxwel_moonga@srmap.edu.in');
+      if (maxwelUser) {
+        maxwelUser.rollNumber = "AP26110090271";
+        maxwelUser.name = "MAXWEL MOONGA";
+      } else {
+        db.users.push({
+          email: "maxwel_moonga@srmap.edu.in",
+          name: "MAXWEL MOONGA",
+          rollNumber: "AP26110090271",
+          section: "D",
+          batch: "2024-2028",
+          role: "student",
+          createdAt: new Date().toISOString()
+        });
+      }
+
       saveDB();
       console.log(`Database loaded successfully from file (${db.students.length} students enrolled).`);
     } else {
