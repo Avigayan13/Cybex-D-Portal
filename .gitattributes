@@ -1,0 +1,30 @@
+# ==============================================================================
+# GitHub Linguist Language Detection Configuration for CYBEX D Portal
+# ==============================================================================
+
+# Enable Database Schemas (SQL) in GitHub language breakdown
+server/*.sql linguist-detectable=true
+server/*.sql linguist-language=SQL
+
+# UI Presentation & View Templates -> HTML
+src/pages/FeedbackPage.jsx linguist-language=HTML
+src/pages/LandingPage.jsx linguist-language=HTML
+src/pages/StudentDashboard.jsx linguist-language=HTML
+src/pages/TimetablePage.jsx linguist-language=HTML
+src/pages/AuthPage.jsx linguist-language=HTML
+src/components/DisabledNoticeModal.jsx linguist-language=HTML
+src/components/NoticeBanner.jsx linguist-language=HTML
+src/components/MobileNav.jsx linguist-language=HTML
+src/components/Modal.jsx linguist-language=HTML
+
+# Dynamic Styling, Visual FX & 3D CSS Canvas -> CSS
+src/components/InteractiveDoodleBackground.jsx linguist-language=CSS
+src/components/AnimatedStudentAvatar.jsx linguist-language=CSS
+src/components/ThreeTimetable.jsx linguist-language=CSS
+src/components/Interactive3DTimetable.jsx linguist-language=CSS
+tailwind.config.js linguist-language=CSS
+postcss.config.js linguist-language=CSS
+
+# Ignore large raw seed data & JSON databases from code ratio distortion
+server/seedData.js linguist-vendored
+data/database.json linguist-vendored

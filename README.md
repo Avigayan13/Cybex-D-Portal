@@ -1,14 +1,18 @@
 # 🌐 CYBEX D • SRM AP — CSE Section D Portal
 
-<div align=center>
+<div align="center">
 
-[![Vercel Deployment](https://img.shields.io/badge/Deployed%20with-Vercel-000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed%20with-Vercel-000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://cybex-d-portal.vercel.app/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.1-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![HTML5](https://img.shields.io/badge/HTML5-Semantic%20UI-E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-Modern%20Design-1572B6.svg?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Vite](https://img.shields.io/badge/Vite-6.1-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-Backend-000000.svg?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Schemas-4169E1.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 </div>
 
