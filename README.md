@@ -89,3 +89,40 @@ npm run dev
 <div align="center">
 <sub>Crafted with ☕ and 0% sleep for the students of CSE Section D • SRM University AP</sub>
 </div>
+
+
+---
+
+## 🛠️ Local development & configuration
+
+Use this checklist to run CYBEX D locally without exposing project credentials.
+
+1. Install a current LTS version of [Node.js](https://nodejs.org/) (npm is included).
+2. Clone the repository and install packages:
+
+   ```bash
+   git clone https://github.com/Avigayan13/Cybex-D-Portal.git
+   cd Cybex-D-Portal
+   npm install
+   ```
+
+3. Copy `.env.example` to a local `.env` file and fill in only the values required for your own development environment. Keep the variable names exactly as shown in `.env.example`.
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open the local address printed by Vite in your browser.
+
+> **Security note:** Never commit `.env` files, service keys, OTP secrets, or production credentials. `.env.example` is the safe place to document required variable names without including real values.
+
+### Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `npm install` fails | Confirm that Node.js is installed, then try again from the project folder. |
+| The app reports missing configuration | Check that `.env` exists locally and that its variable names match `.env.example`. |
+| Port already in use | Stop the other local development server or follow Vite's prompt to use another port. |
+
+This guide is intended to help contributors reproduce the local setup while keeping the production portal and its credentials protected.
