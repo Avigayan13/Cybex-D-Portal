@@ -20,7 +20,7 @@
 
 ## 📖 Overview
 
-**CYBEX D** is an institutional web portal engineered specifically for the 58 students of **B.Tech CSE (Cyber Security) - Section D, Semester IV** at **SRM University AP**.
+**CYBEX D** is an institutional web portal
 
 Built with a **dark-mode liquid-glass aesthetic**, interactive mathematical & computing doodle particles, real-time timetable countdowns, slide-wise mid-term surveys, anonymous grievance redressal, and direct Class Representative administrative tools.
 
